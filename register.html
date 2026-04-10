@@ -253,6 +253,67 @@ header {
 .k-off:hover  { background: #37474f; }
 .k-off:active { transform: none; }
 
+/* ── Guide panel (left) ─────────────────── */
+.guide-panel {
+    width: 158px;
+    flex-shrink: 0;
+    background: #263238;
+    border-radius: 8px 8px 0 0;
+    overflow-y: auto;
+    box-shadow: 0 1px 4px rgba(0,0,0,.18);
+    padding-bottom: 8px;
+}
+.guide-head {
+    padding: 6px 12px;
+    font-size: 0.76rem;
+    color: #cfd8dc;
+    border-bottom: 1px solid #37474f;
+    position: sticky;
+    top: 0;
+    background: #263238;
+}
+.guide-section {
+    padding: 8px 12px 4px;
+}
+.guide-section + .guide-section {
+    border-top: 1px solid #37474f;
+}
+.guide-state {
+    font-size: 0.68rem;
+    color: #546e7a;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-bottom: 5px;
+}
+.guide-item {
+    display: flex;
+    align-items: baseline;
+    gap: 7px;
+    padding: 3px 0;
+    font-size: 0.8rem;
+}
+.guide-key {
+    background: #37474f;
+    color: #eceff1;
+    border-radius: 4px;
+    padding: 1px 6px;
+    font-family: "Courier New", monospace;
+    font-size: 0.78rem;
+    white-space: nowrap;
+    flex-shrink: 0;
+}
+.guide-key.green  { background: #1b5e20; }
+.guide-key.orange { background: #e65100; }
+.guide-key.blue   { background: #1565c0; }
+.guide-key.purple { background: #6a1b9a; }
+.guide-key.red    { background: #b71c1c; }
+.guide-key.teal   { background: #00695c; }
+.guide-desc {
+    color: #90a4ae;
+    font-size: 0.78rem;
+    line-height: 1.3;
+}
+
 /* ── History panel ───────────────────────── */
 .history-panel {
     position: fixed;
@@ -375,6 +436,60 @@ header {
 </header>
 
 <div class="panels">
+
+    <!-- Guide panel -->
+    <div class="guide-panel">
+        <div class="guide-head">操作方法</div>
+
+        <div class="guide-section">
+            <div class="guide-state">商品登録</div>
+            <div class="guide-item">
+                <span class="guide-key green">Enter</span>
+                <span class="guide-desc">商品コード確定<br>数量確定</span>
+            </div>
+            <div class="guide-item">
+                <span class="guide-key red">BS</span>
+                <span class="guide-desc">入力を1文字削除</span>
+            </div>
+            <div class="guide-item">
+                <span class="guide-key orange">－</span>
+                <span class="guide-desc">直前の商品を削除</span>
+            </div>
+            <div class="guide-item">
+                <span class="guide-key blue">＋</span>
+                <span class="guide-desc">直前の数量を変更</span>
+            </div>
+        </div>
+
+        <div class="guide-section">
+            <div class="guide-state">会計へ進む</div>
+            <div class="guide-item">
+                <span class="guide-key purple">00</span>
+                <span class="guide-desc">お会計フェーズへ</span>
+            </div>
+        </div>
+
+        <div class="guide-section">
+            <div class="guide-state">会計</div>
+            <div class="guide-item">
+                <span class="guide-key green">Enter</span>
+                <span class="guide-desc">お預かり金額確定</span>
+            </div>
+            <div class="guide-item">
+                <span class="guide-key red">BS</span>
+                <span class="guide-desc">金額を1桁削除</span>
+            </div>
+        </div>
+
+        <div class="guide-section">
+            <div class="guide-state">その他</div>
+            <div class="guide-item">
+                <span class="guide-key teal">履歴</span>
+                <span class="guide-desc">レシート履歴を開閉</span>
+            </div>
+        </div>
+    </div>
+
     <div class="cart-panel">
         <div class="cart-head">
             <span>No</span>
