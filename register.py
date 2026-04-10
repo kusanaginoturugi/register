@@ -7,7 +7,9 @@
   商品コード(2桁) + [Enter]  -> 商品を選択
   数量           + [Enter]  -> カートに追加
   [00]           + [Enter]  -> お会計へ進む
-  [98]           + [Enter]  -> 商品一覧を表示
+  [-]            + [Enter]  -> 直前の商品をカートから削除
+  [+]            + [Enter]  -> 直前の商品の数量を変更
+  [/]            + [Enter]  -> 商品一覧を表示（もう一度で閉じる）
   [99]           + [Enter]  -> システム終了
   [BS]                      -> 入力を訂正（Enter前に有効）
 """
@@ -163,8 +165,8 @@ def register_phase():
         show_cart(cart, msg)
         msg = ""
 
-        print("  商品コード(2桁)+[Enter] で商品追加")
-        print("  [00]=会計へ  [98]=商品一覧  [99]=終了")
+        print("  商品コード(2桁)+[Enter]  商品追加")
+        print("  [00]=会計  [-]=直前削除  [+]=数量変更  [/]=商品一覧  [99]=終了")
         rule()
 
         code = ask("商品コード >> ")
@@ -175,8 +177,38 @@ def register_phase():
             print("\n  ご利用ありがとうございました。\n")
             sys.exit(0)
 
-        if code == "98":
+        if code in ("/", "98"):
             show_product_list()
+            continue
+
+        if code == "-":
+            if not cart:
+                msg = "!! カートに商品がありません"
+            else:
+                removed = cart.pop()
+                msg = f">> [{removed[0]}] {removed[1]} をカートから削除しました"
+            continue
+
+        if code == "+":
+            if not cart:
+                msg = "!! カートに商品がありません"
+                continue
+            last_code, last_name, last_qty, last_price, _ = cart[-1]
+            clear()
+            header()
+            show_cart(cart)
+            print(f"  数量変更: [{last_code}] {wljust(last_name, 14)}  現在: {last_qty} 個")
+            rule()
+            qty_str = ask("新しい数量 >> ")
+            try:
+                qty = int(qty_str)
+                if not (1 <= qty <= 999):
+                    raise ValueError
+            except ValueError:
+                msg = "!! 数量は 1〜999 の整数で入力してください"
+                continue
+            cart[-1] = (last_code, last_name, qty, last_price, qty * last_price)
+            msg = f">> {last_name} の数量を {last_qty}個 → {qty}個 に変更しました"
             continue
 
         if code == "00":
@@ -201,8 +233,7 @@ def register_phase():
         clear()
         header()
         show_cart(cart)
-        name_disp = wljust(name, 14)
-        print(f"  選択商品: [{code}] {name_disp}  ¥{price:,} / 個")
+        print(f"  選択商品: [{code}] {wljust(name, 14)}  ¥{price:,} / 個")
         rule()
 
         qty_str = ask("数量 >> ")
