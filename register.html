@@ -625,6 +625,68 @@ function toggleReceiptBody(no) {
     document.getElementById(`arr-${no}`).classList.toggle('open');
 }
 
+// ─── 効果音（Web Audio API） ──────────────────────────────────
+let _audioCtx = null;
+
+function _ac() {
+    if (!_audioCtx) _audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    if (_audioCtx.state === 'suspended') _audioCtx.resume();
+    return _audioCtx;
+}
+
+/** バーコードスキャナ風ビープ（商品登録確定） */
+function playBeep() {
+    try {
+        const ctx = _ac(), t = ctx.currentTime;
+        const osc = ctx.createOscillator();
+        const g   = ctx.createGain();
+        osc.connect(g); g.connect(ctx.destination);
+        osc.type = 'sine';
+        osc.frequency.value = 1800;
+        g.gain.setValueAtTime(0.25, t);
+        g.gain.exponentialRampToValueAtTime(0.001, t + 0.12);
+        osc.start(t); osc.stop(t + 0.12);
+    } catch(e) {}
+}
+
+/** レジドロワー風サウンド（精算確定） */
+function playDrawer() {
+    try {
+        const ctx = _ac(), t = ctx.currentTime;
+
+        // 「カッ」― 機械的なクリック音
+        const bufSize = Math.floor(ctx.sampleRate * 0.04);
+        const buf  = ctx.createBuffer(1, bufSize, ctx.sampleRate);
+        const data = buf.getChannelData(0);
+        for (let i = 0; i < bufSize; i++)
+            data[i] = (Math.random() * 2 - 1) * Math.exp(-i / (bufSize * 0.25));
+        const click     = ctx.createBufferSource();
+        click.buffer    = buf;
+        const clickFilt = ctx.createBiquadFilter();
+        clickFilt.type  = 'lowpass'; clickFilt.frequency.value = 900;
+        const clickGain = ctx.createGain(); clickGain.gain.value = 0.7;
+        click.connect(clickFilt); clickFilt.connect(clickGain); clickGain.connect(ctx.destination);
+        click.start(t);
+
+        // 「チーン」― ベル基音
+        const b1 = ctx.createOscillator(), g1 = ctx.createGain();
+        b1.connect(g1); g1.connect(ctx.destination);
+        b1.type = 'sine'; b1.frequency.value = 1400;
+        g1.gain.setValueAtTime(0, t + 0.025);
+        g1.gain.linearRampToValueAtTime(0.45, t + 0.04);
+        g1.gain.exponentialRampToValueAtTime(0.001, t + 0.95);
+        b1.start(t + 0.025); b1.stop(t + 0.95);
+
+        // ベル倍音（高域）
+        const b2 = ctx.createOscillator(), g2 = ctx.createGain();
+        b2.connect(g2); g2.connect(ctx.destination);
+        b2.type = 'sine'; b2.frequency.value = 2300;
+        g2.gain.setValueAtTime(0.18, t + 0.025);
+        g2.gain.exponentialRampToValueAtTime(0.001, t + 0.45);
+        b2.start(t + 0.025); b2.stop(t + 0.45);
+    } catch(e) {}
+}
+
 // ─── キー処理 ─────────────────────────────────────────────────
 function press(key) {
     // * キーは状態によらず履歴トグル
@@ -690,6 +752,7 @@ function onQty(key) {
         const subtotal = qty * selProd.price;
         cart.push({ code: selProd.code, name: selProd.name, qty, price: selProd.price, subtotal });
         setMsg(`「${selProd.name}」× ${qty} = ¥${fmt(subtotal)} をカートに追加`, 'success');
+        playBeep();
         selProd = null;
         input   = '';
         state   = S.CODE;
@@ -723,6 +786,7 @@ function onPayment(key) {
         if (payment < total) { setMsg(`¥${fmt(total - payment)} 不足しています`, 'error'); return; }
         paid  = payment;
         state = S.CHANGE;
+        playDrawer();
         return;
     }
     if (/^\d$/.test(key) || key === '00') appendDigits(key, 7);

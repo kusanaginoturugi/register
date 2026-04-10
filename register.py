@@ -16,6 +16,8 @@
 
 import os
 import sys
+import subprocess
+import threading
 
 # ============================================================
 # 商品マスターデータ  コード -> (商品名, 単価)
@@ -44,6 +46,49 @@ PRODUCTS = {
 }
 
 W = 52  # 表示幅
+
+# ============================================================
+# 効果音
+# Linux: beep コマンド（要: sudo apt install beep）が使えない
+# 場合はターミナルベル（\a）にフォールバック。
+# ============================================================
+
+def _beep_async(args_list):
+    """非同期で beep コマンドを試し、失敗時はターミナルベル"""
+    def _run():
+        for args in args_list:
+            try:
+                subprocess.run(args, capture_output=True, timeout=2)
+                return
+            except Exception:
+                continue
+        sys.stdout.write('\a')
+        sys.stdout.flush()
+    threading.Thread(target=_run, daemon=True).start()
+
+def play_beep():
+    """商品登録確定音（短いビープ）"""
+    if sys.platform == 'darwin':
+        _beep_async([['osascript', '-e', 'beep']])
+    elif sys.platform == 'win32':
+        def _w():
+            import winsound; winsound.Beep(1800, 110)
+        threading.Thread(target=_w, daemon=True).start()
+    else:
+        _beep_async([['beep', '-f', '1800', '-l', '110']])
+
+def play_drawer():
+    """ドロワー開放音（カッ + チーン）"""
+    if sys.platform == 'darwin':
+        _beep_async([['osascript', '-e', 'beep 2']])
+    elif sys.platform == 'win32':
+        def _w():
+            import winsound
+            winsound.Beep(800, 60)
+            winsound.Beep(1400, 420)
+        threading.Thread(target=_w, daemon=True).start()
+    else:
+        _beep_async([['beep', '-f', '800', '-l', '60', '-n', '-f', '1400', '-l', '420']])
 
 
 # ============================================================
@@ -248,6 +293,7 @@ def register_phase():
 
         subtotal = qty * price
         cart.append((code, name, qty, price, subtotal))
+        play_beep()
         msg = f">> {name} x {qty}個 = ¥{subtotal:,}  登録しました"
 
 
@@ -284,6 +330,7 @@ def checkout_phase(cart):
 
         break
 
+    play_drawer()
     # --- 完了画面 ---
     change = payment - total
     clear()
