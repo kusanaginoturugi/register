@@ -1,0 +1,646 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>テンキーレジシステム</title>
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+    font-family: "Helvetica Neue", Arial, "Hiragino Kaku Gothic ProN", sans-serif;
+    background: #eceff1;
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+/* ── Header ─────────────────────────────── */
+header {
+    background: #263238;
+    color: #eceff1;
+    height: 44px;
+    padding: 0 20px;
+    display: flex;
+    align-items: center;
+    font-size: 1rem;
+    font-weight: bold;
+    letter-spacing: 0.06em;
+    flex-shrink: 0;
+}
+
+/* ── Panels (top half) ───────────────────── */
+.panels {
+    display: flex;
+    flex: 1;
+    gap: 8px;
+    padding: 8px 8px 0;
+    overflow: hidden;
+    min-height: 0;
+}
+
+/* Cart */
+.cart-panel {
+    flex: 1;
+    background: #fff;
+    border-radius: 8px 8px 0 0;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    box-shadow: 0 1px 4px rgba(0,0,0,.12);
+}
+
+.cart-head {
+    background: #37474f;
+    color: #cfd8dc;
+    padding: 6px 12px;
+    font-size: 0.76rem;
+    display: grid;
+    grid-template-columns: 28px 1fr 48px 60px 72px;
+    gap: 4px;
+    flex-shrink: 0;
+}
+.r { text-align: right; }
+
+.cart-body {
+    flex: 1;
+    overflow-y: auto;
+}
+
+.cart-empty {
+    padding: 28px;
+    text-align: center;
+    color: #b0bec5;
+    font-size: 0.88rem;
+}
+
+.cart-row {
+    display: grid;
+    grid-template-columns: 28px 1fr 48px 60px 72px;
+    gap: 4px;
+    padding: 7px 12px;
+    border-bottom: 1px solid #f5f5f5;
+    font-size: 0.88rem;
+}
+.cart-row:last-child { border-bottom: none; }
+.cart-row.last-item {
+    background: #fffde7;
+    border-left: 3px solid #ffc107;
+    padding-left: 9px;
+}
+
+.cart-foot {
+    background: #263238;
+    color: #fff;
+    padding: 10px 14px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-shrink: 0;
+}
+.total-label { font-size: 0.85rem; color: #78909c; }
+.total-value { font-size: 1.5rem; font-weight: bold; color: #ffca28; }
+
+/* Product list */
+.product-panel {
+    width: 210px;
+    flex-shrink: 0;
+    background: #fff;
+    border-radius: 8px 8px 0 0;
+    overflow-y: auto;
+    box-shadow: 0 1px 4px rgba(0,0,0,.12);
+}
+
+.product-head {
+    background: #37474f;
+    color: #cfd8dc;
+    padding: 6px 12px;
+    font-size: 0.76rem;
+    position: sticky;
+    top: 0;
+    z-index: 1;
+}
+
+.product-row {
+    display: grid;
+    grid-template-columns: 30px 1fr auto;
+    gap: 4px;
+    padding: 5px 12px;
+    border-bottom: 1px solid #f5f5f5;
+    font-size: 0.82rem;
+    align-items: center;
+}
+.product-row:last-child { border-bottom: none; }
+.product-row:hover { background: #f5f5f5; }
+.p-code  { color: #90a4ae; }
+.p-price { color: #c62828; font-weight: 600; white-space: nowrap; }
+
+/* ── Controls (bottom) ───────────────────── */
+.controls {
+    padding: 8px;
+    display: flex;
+    gap: 8px;
+    align-items: flex-start;
+    flex-shrink: 0;
+}
+
+/* Input display */
+.display {
+    flex: 1;
+    background: #1c2833;
+    border-radius: 8px;
+    padding: 12px 18px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 5px;
+    min-width: 0;
+    align-self: stretch;
+}
+
+.d-label {
+    font-size: 0.72rem;
+    color: #546e7a;
+    letter-spacing: 0.04em;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.d-value {
+    font-family: "Courier New", Courier, monospace;
+    font-size: 1.9rem;
+    color: #00e676;
+    letter-spacing: 3px;
+    line-height: 1.2;
+    min-height: 2.3rem;
+}
+
+.d-msg {
+    font-size: 0.82rem;
+    min-height: 1.1em;
+    color: transparent;
+}
+.d-msg.error   { color: #ef5350; }
+.d-msg.success { color: #66bb6a; }
+.d-msg.info    { color: #42a5f5; }
+
+/* Change state highlight */
+.display.done .d-label { color: #ffa726; }
+.display.done .d-value { color: #ffa726; }
+
+/* ── Numpad ──────────────────────────────── */
+.numpad {
+    display: grid;
+    grid-template-columns: repeat(5, 58px);
+    grid-template-rows: repeat(4, 54px);
+    gap: 5px;
+    flex-shrink: 0;
+}
+
+.k {
+    background: #455a64;
+    color: #eceff1;
+    border: none;
+    border-radius: 6px;
+    font-size: 1.2rem;
+    font-weight: 700;
+    cursor: pointer;
+    user-select: none;
+    transition: background .08s, transform .05s;
+    -webkit-tap-highlight-color: transparent;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.k:hover  { background: #546e7a; }
+.k:active { transform: scale(0.91); background: #37474f; }
+
+.k-bs    { background: #b71c1c; }
+.k-bs:hover  { background: #c62828; }
+.k-bs:active { background: #7f0000; }
+
+.k-00    { background: #6a1b9a; }
+.k-00:hover  { background: #7b1fa2; }
+.k-00:active { background: #4a148c; }
+
+.k-minus { background: #e65100; }
+.k-minus:hover  { background: #f4511e; }
+.k-minus:active { background: #bf360c; }
+
+.k-plus  { background: #1565c0; }
+.k-plus:hover  { background: #1976d2; }
+.k-plus:active { background: #0d47a1; }
+
+.k-enter {
+    background: #1b5e20;
+    font-size: 0.95rem;
+    grid-column: span 3;
+}
+.k-enter:hover  { background: #2e7d32; }
+.k-enter:active { background: #003300; }
+
+.k-zero { grid-column: span 2; }
+
+.k-off {
+    background: #37474f;
+    color: #455a64;
+    cursor: default;
+    font-size: 0.9rem;
+}
+.k-off:hover  { background: #37474f; }
+.k-off:active { transform: none; }
+</style>
+</head>
+<body>
+
+<header>テンキーレジシステム</header>
+
+<div class="panels">
+
+    <!-- Cart panel -->
+    <div class="cart-panel">
+        <div class="cart-head">
+            <span>No</span>
+            <span>商品名</span>
+            <span class="r">数量</span>
+            <span class="r">単価</span>
+            <span class="r">小計</span>
+        </div>
+        <div class="cart-body" id="cartBody">
+            <div class="cart-empty">商品を登録してください</div>
+        </div>
+        <div class="cart-foot">
+            <span class="total-label">合計</span>
+            <span class="total-value" id="cartTotal">¥0</span>
+        </div>
+    </div>
+
+    <!-- Product list panel -->
+    <div class="product-panel">
+        <div class="product-head">商品一覧</div>
+        <div id="productList"></div>
+    </div>
+
+</div>
+
+<div class="controls">
+
+    <!-- Display -->
+    <div class="display" id="display">
+        <div class="d-label"  id="dLabel">商品コードを入力してください</div>
+        <div class="d-value"  id="dValue">__</div>
+        <div class="d-msg"    id="dMsg"></div>
+    </div>
+
+    <!-- Numpad (5×4 grid) -->
+    <div class="numpad">
+        <!-- row 1 -->
+        <button class="k"       onclick="press('7')">7</button>
+        <button class="k"       onclick="press('8')">8</button>
+        <button class="k"       onclick="press('9')">9</button>
+        <button class="k k-bs"  onclick="press('BS')">BS</button>
+        <button class="k k-off" title="未使用（将来のオプション）">✕</button>
+        <!-- row 2 -->
+        <button class="k"       onclick="press('4')">4</button>
+        <button class="k"       onclick="press('5')">5</button>
+        <button class="k"       onclick="press('6')">6</button>
+        <button class="k k-00"  onclick="press('00')">00</button>
+        <button class="k k-off" title="未使用（将来のオプション）">÷</button>
+        <!-- row 3 -->
+        <button class="k"         onclick="press('1')">1</button>
+        <button class="k"         onclick="press('2')">2</button>
+        <button class="k"         onclick="press('3')">3</button>
+        <button class="k k-minus" onclick="press('-')">－</button>
+        <button class="k k-plus"  onclick="press('+')">＋</button>
+        <!-- row 4 -->
+        <button class="k k-zero"  onclick="press('0')">0</button>
+        <button class="k k-enter" onclick="press('Enter')">確定 Enter</button>
+    </div>
+
+</div>
+
+<script>
+// ─── 商品マスター ─────────────────────────────────────────────
+const PRODUCTS = {
+    "01": { name: "コーヒー",           price:  300 },
+    "02": { name: "紅茶",               price:  280 },
+    "03": { name: "オレンジジュース",    price:  250 },
+    "04": { name: "サンドイッチ",        price:  450 },
+    "05": { name: "おにぎり",            price:  150 },
+    "06": { name: "食パン",              price:  200 },
+    "07": { name: "ケーキ",              price:  500 },
+    "08": { name: "クッキー",            price:  350 },
+    "09": { name: "ガム",                price:  100 },
+    "10": { name: "チョコレート",         price:  180 },
+    "11": { name: "ポテトチップス",       price:  220 },
+    "12": { name: "コーラ",              price:  150 },
+    "13": { name: "緑茶ペットボトル",     price:  130 },
+    "14": { name: "ミネラルウォーター",   price:  100 },
+    "15": { name: "アイスクリーム",       price:  280 },
+    "20": { name: "日替わり弁当A",        price:  600 },
+    "21": { name: "日替わり弁当B",        price:  550 },
+    "22": { name: "日替わり弁当C",        price:  480 },
+    "30": { name: "週刊誌",              price:  550 },
+    "31": { name: "月刊誌",              price:  850 },
+};
+
+// ─── 状態 ─────────────────────────────────────────────────────
+const S = {
+    CODE:    'CODE',     // 商品コード入力待ち
+    QTY:     'QTY',      // 数量入力待ち
+    CHG_QTY: 'CHG_QTY', // 数量変更入力待ち（＋キー）
+    PAYMENT: 'PAYMENT',  // お預かり金額入力待ち
+    CHANGE:  'CHANGE',   // お釣り表示
+};
+
+let state   = S.CODE;
+let input   = '';
+let cart    = [];          // [{code,name,qty,price,subtotal}]
+let selProd = null;        // 選択中の商品
+let paid    = 0;           // お預かり金額
+
+let msgText  = '';
+let msgType  = 'info';
+let msgTimer = null;
+
+function setMsg(text, type = 'info') {
+    msgText = text;
+    msgType = type;
+    if (msgTimer) clearTimeout(msgTimer);
+    msgTimer = setTimeout(() => { msgText = ''; render(); }, 3500);
+}
+
+// ─── キー処理 ─────────────────────────────────────────────────
+function press(key) {
+    switch (state) {
+        case S.CODE:    onCode(key);    break;
+        case S.QTY:     onQty(key);     break;
+        case S.CHG_QTY: onChgQty(key);  break;
+        case S.PAYMENT: onPayment(key); break;
+        case S.CHANGE:  onChangeDone(key); break;
+    }
+    render();
+}
+
+/** 最大 maxLen 文字まで input に追記する（"00" は 2 文字分） */
+function appendDigits(key, maxLen) {
+    const digits = key === '00' ? '00' : key;
+    const space  = maxLen - input.length;
+    if (space > 0) input += digits.slice(0, space);
+}
+
+function onCode(key) {
+    if (key === 'BS') { input = input.slice(0, -1); return; }
+
+    if (key === '-') {
+        if (cart.length === 0) { setMsg('カートに商品がありません', 'error'); return; }
+        const removed = cart.pop();
+        input = '';
+        setMsg(`「${removed.name}」をカートから削除しました`, 'success');
+        return;
+    }
+    if (key === '+') {
+        if (cart.length === 0) { setMsg('カートに商品がありません', 'error'); return; }
+        input = '';
+        state = S.CHG_QTY;
+        return;
+    }
+    if (key === '*' || key === '/') return; // 未使用
+
+    if (key === 'Enter') {
+        if (input === '') return; // 空エンターは無視
+        if (input === '00') {
+            if (cart.length === 0) { setMsg('商品が登録されていません', 'error'); input = ''; return; }
+            input = '';
+            state = S.PAYMENT;
+            return;
+        }
+        if (input.length !== 2) {
+            setMsg('2桁の商品コードを入力してください', 'error');
+            input = '';
+            return;
+        }
+        if (!PRODUCTS[input]) {
+            setMsg(`[${input}] は登録されていない商品コードです`, 'error');
+            input = '';
+            return;
+        }
+        selProd = { code: input, ...PRODUCTS[input] };
+        input   = '';
+        state   = S.QTY;
+        return;
+    }
+
+    if (/^\d$/.test(key) || key === '00') appendDigits(key, 2);
+}
+
+function onQty(key) {
+    if (key === 'BS') { input = input.slice(0, -1); return; }
+    if (key === 'Enter') {
+        const qty = parseInt(input, 10);
+        if (!input || qty < 1 || qty > 999) {
+            setMsg('数量は 1〜999 で入力してください', 'error');
+            input = '';
+            return;
+        }
+        const subtotal = qty * selProd.price;
+        cart.push({ code: selProd.code, name: selProd.name, qty, price: selProd.price, subtotal });
+        setMsg(`「${selProd.name}」× ${qty} = ¥${fmt(subtotal)} をカートに追加`, 'success');
+        selProd = null;
+        input   = '';
+        state   = S.CODE;
+        return;
+    }
+    if (/^\d$/.test(key) || key === '00') appendDigits(key, 3);
+}
+
+function onChgQty(key) {
+    if (key === 'BS') { input = input.slice(0, -1); return; }
+    if (key === 'Enter') {
+        const qty = parseInt(input, 10);
+        if (!input || qty < 1 || qty > 999) {
+            setMsg('数量は 1〜999 で入力してください', 'error');
+            input = '';
+            return;
+        }
+        const item    = cart[cart.length - 1];
+        item.qty      = qty;
+        item.subtotal = qty * item.price;
+        setMsg(`「${item.name}」の数量を ${qty} 個に変更しました`, 'success');
+        input = '';
+        state = S.CODE;
+        return;
+    }
+    if (/^\d$/.test(key) || key === '00') appendDigits(key, 3);
+}
+
+function onPayment(key) {
+    if (key === 'BS') { input = input.slice(0, -1); return; }
+    if (key === 'Enter') {
+        const total   = cartTotal();
+        const payment = parseInt(input, 10);
+        if (!input || payment <= 0) {
+            setMsg('金額を入力してください', 'error');
+            input = '';
+            return;
+        }
+        if (payment < total) {
+            setMsg(`¥${fmt(total - payment)} 不足しています`, 'error');
+            return;
+        }
+        paid  = payment;
+        state = S.CHANGE;
+        return;
+    }
+    if (/^\d$/.test(key) || key === '00') appendDigits(key, 7);
+}
+
+function onChangeDone(key) {
+    if (key === 'Enter') {
+        cart    = [];
+        input   = '';
+        selProd = null;
+        paid    = 0;
+        msgText = '';
+        if (msgTimer) clearTimeout(msgTimer);
+        state = S.CODE;
+    }
+}
+
+// ─── ユーティリティ ────────────────────────────────────────────
+function cartTotal() {
+    return cart.reduce((s, item) => s + item.subtotal, 0);
+}
+function fmt(n) {
+    return n.toLocaleString('ja-JP');
+}
+
+// ─── 描画 ─────────────────────────────────────────────────────
+function render() {
+    renderCart();
+    renderDisplay();
+}
+
+function renderCart() {
+    const body  = document.getElementById('cartBody');
+    const total = document.getElementById('cartTotal');
+
+    if (cart.length === 0) {
+        body.innerHTML = '<div class="cart-empty">商品を登録してください</div>';
+    } else {
+        body.innerHTML = cart.map((item, i) => `
+            <div class="cart-row${i === cart.length - 1 ? ' last-item' : ''}">
+                <span>${i + 1}</span>
+                <span>${item.name}</span>
+                <span class="r">${item.qty}</span>
+                <span class="r">¥${fmt(item.price)}</span>
+                <span class="r">¥${fmt(item.subtotal)}</span>
+            </div>
+        `).join('');
+        body.scrollTop = body.scrollHeight;
+    }
+    total.textContent = `¥${fmt(cartTotal())}`;
+}
+
+function renderDisplay() {
+    const disp  = document.getElementById('display');
+    const label = document.getElementById('dLabel');
+    const val   = document.getElementById('dValue');
+    const msg   = document.getElementById('dMsg');
+
+    disp.className = 'display' + (state === S.CHANGE ? ' done' : '');
+
+    switch (state) {
+        case S.CODE: {
+            // 2桁入力済みなら商品名をプレビュー表示
+            const preview = (input.length === 2 && PRODUCTS[input])
+                ? ` → ${PRODUCTS[input].name}  ¥${fmt(PRODUCTS[input].price)}`
+                : '';
+            label.textContent = '商品コード入力  /  [00]=会計  /  [－]=直前削除  /  [＋]=数量変更';
+            val.innerHTML = `<span>${input || '__'}</span>`
+                + `<span style="font-size:0.85rem;color:#42a5f5;margin-left:14px">${preview}</span>`;
+            break;
+        }
+        case S.QTY:
+            label.textContent = `数量を入力 → [${selProd.code}] ${selProd.name}  ¥${fmt(selProd.price)} / 個`;
+            val.textContent   = input || '_';
+            break;
+        case S.CHG_QTY: {
+            const last = cart[cart.length - 1];
+            label.textContent = `新しい数量を入力 → ${last.name}  （現在: ${last.qty} 個）`;
+            val.textContent   = input || '_';
+            break;
+        }
+        case S.PAYMENT:
+            label.textContent = `お預かり金額を入力  /  合計: ¥${fmt(cartTotal())}`;
+            val.textContent   = input ? `¥${fmt(parseInt(input, 10))}` : '¥_';
+            break;
+        case S.CHANGE: {
+            const total  = cartTotal();
+            const change = paid - total;
+            label.textContent = '会計完了  /  [Enter] で次のお客様へ';
+            val.innerHTML = `
+                <span style="font-size:0.82rem;color:#546e7a;display:block;margin-bottom:2px">
+                    合計 ¥${fmt(total)} &nbsp;/&nbsp; お預かり ¥${fmt(paid)}
+                </span>
+                <span>お釣り ¥${fmt(change)}</span>
+            `;
+            break;
+        }
+    }
+
+    if (msgText) {
+        msg.textContent = msgText;
+        msg.className   = `d-msg ${msgType}`;
+    } else {
+        msg.textContent = '';
+        msg.className   = 'd-msg';
+    }
+}
+
+function renderProductList() {
+    const el = document.getElementById('productList');
+    el.innerHTML = Object.entries(PRODUCTS)
+        .sort(([a], [b]) => a.localeCompare(b))
+        .map(([code, { name, price }]) => `
+            <div class="product-row">
+                <span class="p-code">${code}</span>
+                <span>${name}</span>
+                <span class="p-price">¥${fmt(price)}</span>
+            </div>
+        `).join('');
+}
+
+// ─── キーボード入力（実物テンキー対応） ─────────────────────────
+document.addEventListener('keydown', e => {
+    const map = {
+        Numpad0: '0',  Digit0: '0',
+        Numpad1: '1',  Digit1: '1',
+        Numpad2: '2',  Digit2: '2',
+        Numpad3: '3',  Digit3: '3',
+        Numpad4: '4',  Digit4: '4',
+        Numpad5: '5',  Digit5: '5',
+        Numpad6: '6',  Digit6: '6',
+        Numpad7: '7',  Digit7: '7',
+        Numpad8: '8',  Digit8: '8',
+        Numpad9: '9',  Digit9: '9',
+        NumpadEnter:    'Enter',
+        Enter:          'Enter',
+        Backspace:      'BS',
+        NumpadAdd:      '+',
+        NumpadSubtract: '-',
+        NumpadMultiply: '*',
+        NumpadDivide:   '/',
+    };
+    const k = map[e.code];
+    if (k) { e.preventDefault(); press(k); }
+});
+
+// ─── 初期化 ───────────────────────────────────────────────────
+renderProductList();
+render();
+</script>
+</body>
+</html>
