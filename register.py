@@ -49,46 +49,93 @@ W = 52  # 表示幅
 
 # ============================================================
 # 効果音
-# Linux: beep コマンド（要: sudo apt install beep）が使えない
-# 場合はターミナルベル（\a）にフォールバック。
+# sounddevice + numpy で音を生成（pip install sounddevice numpy）
+# インストールされていない場合は beep コマンド → \a にフォールバック
 # ============================================================
 
-def _beep_async(args_list):
-    """非同期で beep コマンドを試し、失敗時はターミナルベル"""
-    def _run():
-        for args in args_list:
-            try:
-                subprocess.run(args, capture_output=True, timeout=2)
-                return
-            except Exception:
-                continue
-        sys.stdout.write('\a')
-        sys.stdout.flush()
-    threading.Thread(target=_run, daemon=True).start()
+def _try_import_audio():
+    try:
+        import sounddevice as sd
+        import numpy as np
+        return sd, np
+    except ImportError:
+        return None, None
+
+def _play_async(fn):
+    threading.Thread(target=fn, daemon=True).start()
 
 def play_beep():
-    """商品登録確定音（短いビープ）"""
-    if sys.platform == 'darwin':
-        _beep_async([['osascript', '-e', 'beep']])
-    elif sys.platform == 'win32':
-        def _w():
-            import winsound; winsound.Beep(1800, 110)
-        threading.Thread(target=_w, daemon=True).start()
+    """バーコードスキャナ風ビープ（商品登録確定）"""
+    sd, np = _try_import_audio()
+    if sd and np:
+        def _play():
+            try:
+                sr = 44100
+                dur = 0.12
+                t = np.linspace(0, dur, int(sr * dur), endpoint=False)
+                wave = np.sin(2 * np.pi * 1800 * t)
+                env  = np.exp(-t / 0.035)          # 急速減衰
+                out  = (wave * env * 0.28).astype(np.float32)
+                sd.play(out, sr); sd.wait()
+            except Exception:
+                pass
+        _play_async(_play)
     else:
-        _beep_async([['beep', '-f', '1800', '-l', '110']])
+        # フォールバック: beep コマンド → ターミナルベル
+        def _fallback():
+            try:
+                subprocess.run(['beep', '-f', '1800', '-l', '110'],
+                               capture_output=True, timeout=2)
+            except Exception:
+                sys.stdout.write('\a'); sys.stdout.flush()
+        _play_async(_fallback)
 
 def play_drawer():
-    """ドロワー開放音（カッ + チーン）"""
-    if sys.platform == 'darwin':
-        _beep_async([['osascript', '-e', 'beep 2']])
-    elif sys.platform == 'win32':
-        def _w():
-            import winsound
-            winsound.Beep(800, 60)
-            winsound.Beep(1400, 420)
-        threading.Thread(target=_w, daemon=True).start()
+    """レジドロワー風サウンド（カッ + チーン）"""
+    sd, np = _try_import_audio()
+    if sd and np:
+        def _play():
+            try:
+                sr = 44100
+
+                # 「カッ」― ノイズバースト（クリック音）
+                c_dur = 0.04
+                t_c   = np.linspace(0, c_dur, int(sr * c_dur), endpoint=False)
+                noise = np.random.uniform(-1, 1, len(t_c))
+                noise = np.convolve(noise, np.ones(18) / 18, mode='same')  # 簡易LPF
+                click = noise * np.exp(-t_c / (c_dur * 0.25)) * 0.65
+
+                # 「チーン」― ベル音（基音 1400Hz + 倍音 2300Hz）
+                b_dur = 0.95
+                t_b   = np.linspace(0, b_dur, int(sr * b_dur), endpoint=False)
+                atk   = int(0.015 * sr)
+                env1  = np.empty_like(t_b)
+                env1[:atk] = np.linspace(0, 0.45, atk)
+                env1[atk:] = 0.45 * np.exp(-(t_b[atk:] - t_b[atk]) / 0.28)
+                bell  = np.sin(2 * np.pi * 1400 * t_b) * env1
+                bell += np.sin(2 * np.pi * 2300 * t_b) * 0.18 * np.exp(-t_b / 0.14)
+
+                # クリック開始から 25ms 後にベルを重ねる
+                delay = int(0.025 * sr)
+                total = max(len(click), delay + len(bell))
+                out   = np.zeros(total, dtype=np.float64)
+                out[:len(click)] += click
+                out[delay:delay + len(bell)] += bell
+                out = np.clip(out, -1, 1).astype(np.float32)
+
+                sd.play(out, sr); sd.wait()
+            except Exception:
+                pass
+        _play_async(_play)
     else:
-        _beep_async([['beep', '-f', '800', '-l', '60', '-n', '-f', '1400', '-l', '420']])
+        def _fallback():
+            try:
+                subprocess.run(
+                    ['beep', '-f', '800', '-l', '60', '-n', '-f', '1400', '-l', '420'],
+                    capture_output=True, timeout=2)
+            except Exception:
+                sys.stdout.write('\a'); sys.stdout.flush()
+        _play_async(_fallback)
 
 
 # ============================================================
