@@ -862,8 +862,8 @@ function onCode(key) {
 function onQty(key) {
     if (key === 'BS') { input = input.slice(0, -1); return; }
     if (key === 'Enter') {
-        const qty = parseInt(input, 10);
-        if (!input || qty < 1 || qty > 999) { setMsg('数量は 1〜999 で入力してください', 'error'); input = ''; return; }
+        const qty = input === '' ? 1 : parseInt(input, 10);
+        if (qty < 1 || qty > 999) { setMsg('数量は 1〜999 で入力してください', 'error'); input = ''; return; }
         const subtotal = qty * selProd.price;
         cart.push({ code: selProd.code, name: selProd.name, qty, price: selProd.price, subtotal });
         setMsg(`「${selProd.name}」× ${qty} = ¥${fmt(subtotal)} をカートに追加`, 'success');
@@ -992,8 +992,13 @@ function renderDisplay() {
             break;
         }
         case S.QTY:
-            label.textContent = `数量を入力 → [${selProd.code}] ${selProd.name}  ¥${fmt(selProd.price)} / 個`;
-            val.textContent   = input || '_';
+            label.textContent = `数量を入力 → [${selProd.code}] ${selProd.name}  ¥${fmt(selProd.price)} / 個  （空Enter=1個）`;
+            if (input) {
+                val.textContent = input;
+            } else {
+                val.innerHTML = '<span style="color:#37474f">1</span>'
+                    + '<span style="font-size:0.8rem;color:#37474f;margin-left:10px;letter-spacing:0">← Enterでそのまま確定</span>';
+            }
             break;
         case S.CHG_QTY: {
             const last = cart[cart.length - 1];

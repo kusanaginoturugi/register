@@ -328,10 +328,10 @@ def register_phase():
         print(f"  選択商品: [{code}] {wljust(name, 14)}  ¥{price:,} / 個")
         rule()
 
-        qty_str = ask("数量 >> ")
+        qty_str = ask("数量 >> [Enter]=1個  ")
 
         try:
-            qty = int(qty_str)
+            qty = int(qty_str) if qty_str else 1
             if not (1 <= qty <= 999):
                 raise ValueError
         except ValueError:
