@@ -7,19 +7,165 @@
 <style>
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
+/* ══════════════════════════════════════════════
+   テーマ変数
+   新テーマ追加: body.テーマ名 { --変数: 値; } を追加するだけ
+   ══════════════════════════════════════════════ */
+:root {
+    /* ── ダークテーマ（デフォルト） ── */
+    --bg-body:         #eceff1;
+    --bg-header:       #263238;
+    --fg-header:       #eceff1;
+    --fg-count:        #78909c;
+    --fg-count-val:    #ffca28;
+
+    --bg-panel:        #ffffff;
+    --bg-panel-head:   #37474f;
+    --fg-panel-head:   #cfd8dc;
+    --border-panel:    none;
+    --border-row:      #f5f5f5;
+    --bg-row-hover:    #f5f5f5;
+    --fg-empty:        #b0bec5;
+
+    --bg-last-item:    #fffde7;
+    --bd-last-item:    #ffc107;
+    --bg-cart-foot:    #263238;
+    --fg-total-lbl:    #78909c;
+    --fg-total-val:    #ffca28;
+
+    --fg-p-code:       #90a4ae;
+    --fg-p-price:      #c62828;
+
+    --bg-display:      #1c2833;
+    --fg-disp-lbl:     #546e7a;
+    --fg-disp-val:     #00e676;
+    --fg-disp-ph:      #2a4050;   /* 数量デフォルト"1"の色 */
+    --fg-disp-done:    #ffa726;
+    --sz-disp-val:     1.9rem;
+    --fg-msg-err:      #ef5350;
+    --fg-msg-ok:       #66bb6a;
+    --fg-msg-info:     #42a5f5;
+
+    --bg-guide:        #263238;
+    --bd-guide:        #37474f;
+    --fg-guide-state:  #546e7a;
+    --fg-guide-desc:   #90a4ae;
+    --bg-guide-key:    #37474f;
+    --fg-guide-key:    #eceff1;
+
+    --bg-key:          #455a64;
+    --fg-key:          #eceff1;
+    --bg-key-hov:      #546e7a;
+    --bg-key-act:      #37474f;
+    --bg-key-bs:       #b71c1c;  --bg-key-bs-hov:   #c62828;  --bg-key-bs-act:   #7f0000;
+    --bg-key-00:       #6a1b9a;  --bg-key-00-hov:   #7b1fa2;  --bg-key-00-act:   #4a148c;
+    --bg-key-minus:    #e65100;  --bg-key-minus-hov:#f4511e;  --bg-key-minus-act:#bf360c;
+    --bg-key-plus:     #1565c0;  --bg-key-plus-hov: #1976d2;  --bg-key-plus-act: #0d47a1;
+    --bg-key-hist:     #00695c;  --bg-key-hist-hov: #00796b;  --bg-key-hist-act: #004d40;
+    --bg-key-theme:    #4a5568;  --bg-key-theme-hov:#5a6678;  --bg-key-theme-act:#3a4558;
+    --bg-key-enter:    #1b5e20;  --bg-key-enter-hov:#2e7d32;  --bg-key-enter-act:#003300;
+    --bg-key-off:      #37474f;  --fg-key-off:      #455a64;
+
+    --bg-hist-panel:   #ffffff;
+    --bg-hist-head:    #263238;
+    --fg-hist-head:    #eceff1;
+    --bg-hist-row-hov: #f5f5f5;
+    --bg-hist-body:    #fafafa;
+    --fg-hist-no:      #546e7a;
+    --fg-hist-dt:      #90a4ae;
+    --fg-hist-tot:     #263238;
+    --fg-hist-item:    #546e7a;
+    --fg-hist-strong:  #263238;
+    --bg-hist-summary: #f5f5f5;
+    --fg-hist-summary: #78909c;
+}
+
+/* ── ハイコントラストテーマ ── */
+body.hc {
+    --bg-body:         #e8e8e8;
+    --bg-header:       #000000;
+    --fg-header:       #ffffff;
+    --fg-count:        #aaaaaa;
+    --fg-count-val:    #ffee00;
+
+    --bg-panel:        #ffffff;
+    --bg-panel-head:   #000000;
+    --fg-panel-head:   #ffffff;
+    --border-panel:    2px solid #000000;
+    --border-row:      #bbbbbb;
+    --bg-row-hover:    #eeeeee;
+    --fg-empty:        #888888;
+
+    --bg-last-item:    #fff8c0;
+    --bd-last-item:    #cc4400;
+    --bg-cart-foot:    #000000;
+    --fg-total-lbl:    #bbbbbb;
+    --fg-total-val:    #ffee00;
+
+    --fg-p-code:       #555555;
+    --fg-p-price:      #aa0000;
+
+    --bg-display:      #000066;
+    --fg-disp-lbl:     #8899ff;
+    --fg-disp-val:     #ffff00;
+    --fg-disp-ph:      #223388;
+    --fg-disp-done:    #ff9900;
+    --sz-disp-val:     2.2rem;
+    --fg-msg-err:      #ff4444;
+    --fg-msg-ok:       #00cc44;
+    --fg-msg-info:     #4499ff;
+
+    --bg-guide:        #111111;
+    --bd-guide:        #444444;
+    --fg-guide-state:  #999999;
+    --fg-guide-desc:   #cccccc;
+    --bg-guide-key:    #333333;
+    --fg-guide-key:    #ffffff;
+
+    --bg-key:          #1a1a1a;
+    --fg-key:          #ffffff;
+    --bg-key-hov:      #333333;
+    --bg-key-act:      #000000;
+    --bg-key-bs:       #cc0000;  --bg-key-bs-hov:   #ee0000;  --bg-key-bs-act:   #880000;
+    --bg-key-00:       #5500aa;  --bg-key-00-hov:   #6600cc;  --bg-key-00-act:   #330077;
+    --bg-key-minus:    #cc3300;  --bg-key-minus-hov:#ee4400;  --bg-key-minus-act:#882200;
+    --bg-key-plus:     #0044bb;  --bg-key-plus-hov: #0055dd;  --bg-key-plus-act: #002288;
+    --bg-key-hist:     #005544;  --bg-key-hist-hov: #007766;  --bg-key-hist-act: #003322;
+    --bg-key-theme:    #444444;  --bg-key-theme-hov:#666666;  --bg-key-theme-act:#222222;
+    --bg-key-enter:    #005500;  --bg-key-enter-hov:#007700;  --bg-key-enter-act:#003300;
+    --bg-key-off:      #333333;  --fg-key-off:      #555555;
+
+    --bg-hist-panel:   #ffffff;
+    --bg-hist-head:    #000000;
+    --fg-hist-head:    #ffffff;
+    --bg-hist-row-hov: #eeeeee;
+    --bg-hist-body:    #f5f5f5;
+    --fg-hist-no:      #444444;
+    --fg-hist-dt:      #666666;
+    --fg-hist-tot:     #000000;
+    --fg-hist-item:    #444444;
+    --fg-hist-strong:  #000000;
+    --bg-hist-summary: #e8e8e8;
+    --fg-hist-summary: #555555;
+}
+
+/* ══════════════════════════════════════════════
+   レイアウト
+   ══════════════════════════════════════════════ */
 body {
     font-family: "Helvetica Neue", Arial, "Hiragino Kaku Gothic ProN", sans-serif;
-    background: #eceff1;
+    background: var(--bg-body);
     height: 100vh;
     display: flex;
     flex-direction: column;
     overflow: hidden;
+    transition: background .2s;
 }
 
-/* ── Header ─────────────────────────────── */
+/* ── Header ── */
 header {
-    background: #263238;
-    color: #eceff1;
+    background: var(--bg-header);
+    color: var(--fg-header);
     height: 44px;
     padding: 0 20px;
     display: flex;
@@ -29,20 +175,30 @@ header {
     letter-spacing: 0.06em;
     flex-shrink: 0;
     gap: 12px;
+    transition: background .2s;
 }
+.header-right { margin-left: auto; display: flex; align-items: center; gap: 10px; }
+.theme-btn {
+    background: transparent;
+    border: 1px solid #546e7a;
+    color: #90a4ae;
+    border-radius: 4px;
+    padding: 3px 9px;
+    font-size: 0.72rem;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: border-color .15s, color .15s;
+}
+.theme-btn:hover { border-color: #90a4ae; color: var(--fg-header); }
 .header-count {
-    margin-left: auto;
     font-size: 0.78rem;
     font-weight: normal;
-    color: #78909c;
+    color: var(--fg-count);
     letter-spacing: 0;
 }
-.header-count span {
-    color: #ffca28;
-    font-weight: bold;
-}
+.header-count span { color: var(--fg-count-val); font-weight: bold; }
 
-/* ── Panels (top half) ───────────────────── */
+/* ── Panels ── */
 .panels {
     display: flex;
     flex: 1;
@@ -55,17 +211,17 @@ header {
 /* Cart */
 .cart-panel {
     flex: 1;
-    background: #fff;
+    background: var(--bg-panel);
+    border: var(--border-panel);
     border-radius: 8px 8px 0 0;
     display: flex;
     flex-direction: column;
     overflow: hidden;
     box-shadow: 0 1px 4px rgba(0,0,0,.12);
 }
-
 .cart-head {
-    background: #37474f;
-    color: #cfd8dc;
+    background: var(--bg-panel-head);
+    color: var(--fg-panel-head);
     padding: 6px 12px;
     font-size: 0.76rem;
     display: grid;
@@ -74,33 +230,29 @@ header {
     flex-shrink: 0;
 }
 .r { text-align: right; }
-
 .cart-body { flex: 1; overflow-y: auto; }
-
 .cart-empty {
     padding: 28px;
     text-align: center;
-    color: #b0bec5;
+    color: var(--fg-empty);
     font-size: 0.88rem;
 }
-
 .cart-row {
     display: grid;
     grid-template-columns: 28px 1fr 48px 60px 72px;
     gap: 4px;
     padding: 7px 12px;
-    border-bottom: 1px solid #f5f5f5;
+    border-bottom: 1px solid var(--border-row);
     font-size: 0.88rem;
 }
 .cart-row:last-child { border-bottom: none; }
 .cart-row.last-item {
-    background: #fffde7;
-    border-left: 3px solid #ffc107;
+    background: var(--bg-last-item);
+    border-left: 3px solid var(--bd-last-item);
     padding-left: 9px;
 }
-
 .cart-foot {
-    background: #263238;
+    background: var(--bg-cart-foot);
     color: #fff;
     padding: 10px 14px;
     display: flex;
@@ -108,21 +260,22 @@ header {
     align-items: center;
     flex-shrink: 0;
 }
-.total-label { font-size: 0.85rem; color: #78909c; }
-.total-value { font-size: 1.5rem; font-weight: bold; color: #ffca28; }
+.total-label { font-size: 0.85rem; color: var(--fg-total-lbl); }
+.total-value { font-size: 1.5rem; font-weight: bold; color: var(--fg-total-val); }
 
 /* Product list */
 .product-panel {
     width: 210px;
     flex-shrink: 0;
-    background: #fff;
+    background: var(--bg-panel);
+    border: var(--border-panel);
     border-radius: 8px 8px 0 0;
     overflow-y: auto;
     box-shadow: 0 1px 4px rgba(0,0,0,.12);
 }
 .product-head {
-    background: #37474f;
-    color: #cfd8dc;
+    background: var(--bg-panel-head);
+    color: var(--fg-panel-head);
     padding: 6px 12px;
     font-size: 0.76rem;
     position: sticky;
@@ -134,16 +287,16 @@ header {
     grid-template-columns: 30px 1fr auto;
     gap: 4px;
     padding: 5px 12px;
-    border-bottom: 1px solid #f5f5f5;
+    border-bottom: 1px solid var(--border-row);
     font-size: 0.82rem;
     align-items: center;
 }
 .product-row:last-child { border-bottom: none; }
-.product-row:hover { background: #f5f5f5; }
-.p-code  { color: #90a4ae; }
-.p-price { color: #c62828; font-weight: 600; white-space: nowrap; }
+.product-row:hover { background: var(--bg-row-hover); }
+.p-code  { color: var(--fg-p-code); }
+.p-price { color: var(--fg-p-price); font-weight: 600; white-space: nowrap; }
 
-/* ── Controls (bottom) ───────────────────── */
+/* ── Controls ── */
 .controls {
     padding: 8px;
     display: flex;
@@ -155,7 +308,7 @@ header {
 /* Input display */
 .display {
     flex: 1;
-    background: #1c2833;
+    background: var(--bg-display);
     border-radius: 8px;
     padding: 12px 18px;
     display: flex;
@@ -164,10 +317,11 @@ header {
     gap: 5px;
     min-width: 0;
     align-self: stretch;
+    transition: background .2s;
 }
 .d-label {
     font-size: 0.72rem;
-    color: #546e7a;
+    color: var(--fg-disp-lbl);
     letter-spacing: 0.04em;
     white-space: nowrap;
     overflow: hidden;
@@ -175,20 +329,20 @@ header {
 }
 .d-value {
     font-family: "Courier New", Courier, monospace;
-    font-size: 1.9rem;
-    color: #00e676;
+    font-size: var(--sz-disp-val);
+    color: var(--fg-disp-val);
     letter-spacing: 3px;
     line-height: 1.2;
     min-height: 2.3rem;
 }
 .d-msg { font-size: 0.82rem; min-height: 1.1em; color: transparent; }
-.d-msg.error   { color: #ef5350; }
-.d-msg.success { color: #66bb6a; }
-.d-msg.info    { color: #42a5f5; }
-.display.done .d-label { color: #ffa726; }
-.display.done .d-value { color: #ffa726; }
+.d-msg.error   { color: var(--fg-msg-err); }
+.d-msg.success { color: var(--fg-msg-ok); }
+.d-msg.info    { color: var(--fg-msg-info); }
+.display.done .d-label { color: var(--fg-disp-done); }
+.display.done .d-value { color: var(--fg-disp-done); }
 
-/* ── Numpad ──────────────────────────────── */
+/* ── Numpad ── */
 .numpad {
     display: grid;
     grid-template-columns: repeat(5, 58px);
@@ -197,8 +351,8 @@ header {
     flex-shrink: 0;
 }
 .k {
-    background: #455a64;
-    color: #eceff1;
+    background: var(--bg-key);
+    color: var(--fg-key);
     border: none;
     border-radius: 6px;
     font-size: 1.2rem;
@@ -211,76 +365,78 @@ header {
     align-items: center;
     justify-content: center;
 }
-.k:hover  { background: #546e7a; }
-.k:active { transform: scale(0.91); background: #37474f; }
+.k:hover  { background: var(--bg-key-hov); }
+.k:active { transform: scale(0.91); background: var(--bg-key-act); }
 
-.k-bs    { background: #b71c1c; }
-.k-bs:hover  { background: #c62828; }
-.k-bs:active { background: #7f0000; }
+.k-bs    { background: var(--bg-key-bs); }
+.k-bs:hover  { background: var(--bg-key-bs-hov); }
+.k-bs:active { background: var(--bg-key-bs-act); }
 
-.k-00    { background: #6a1b9a; }
-.k-00:hover  { background: #7b1fa2; }
-.k-00:active { background: #4a148c; }
+.k-00    { background: var(--bg-key-00); }
+.k-00:hover  { background: var(--bg-key-00-hov); }
+.k-00:active { background: var(--bg-key-00-act); }
 
-.k-minus { background: #e65100; }
-.k-minus:hover  { background: #f4511e; }
-.k-minus:active { background: #bf360c; }
+.k-minus { background: var(--bg-key-minus); }
+.k-minus:hover  { background: var(--bg-key-minus-hov); }
+.k-minus:active { background: var(--bg-key-minus-act); }
 
-.k-plus  { background: #1565c0; }
-.k-plus:hover  { background: #1976d2; }
-.k-plus:active { background: #0d47a1; }
+.k-plus  { background: var(--bg-key-plus); }
+.k-plus:hover  { background: var(--bg-key-plus-hov); }
+.k-plus:active { background: var(--bg-key-plus-act); }
 
-.k-hist  { background: #00695c; font-size: 0.82rem; }
-.k-hist:hover  { background: #00796b; }
-.k-hist:active { background: #004d40; }
+.k-hist  { background: var(--bg-key-hist); font-size: 0.82rem; }
+.k-hist:hover  { background: var(--bg-key-hist-hov); }
+.k-hist:active { background: var(--bg-key-hist-act); }
+
+.k-theme { background: var(--bg-key-theme); font-size: 0.75rem; }
+.k-theme:hover  { background: var(--bg-key-theme-hov); }
+.k-theme:active { background: var(--bg-key-theme-act); }
 
 .k-enter {
-    background: #1b5e20;
+    background: var(--bg-key-enter);
     font-size: 0.95rem;
     grid-column: span 3;
 }
-.k-enter:hover  { background: #2e7d32; }
-.k-enter:active { background: #003300; }
+.k-enter:hover  { background: var(--bg-key-enter-hov); }
+.k-enter:active { background: var(--bg-key-enter-act); }
 
 .k-zero { grid-column: span 2; }
 
 .k-off {
-    background: #37474f;
-    color: #455a64;
+    background: var(--bg-key-off);
+    color: var(--fg-key-off);
     cursor: default;
     font-size: 0.9rem;
 }
-.k-off:hover  { background: #37474f; }
+.k-off:hover  { background: var(--bg-key-off); }
 .k-off:active { transform: none; }
 
-/* ── Guide panel (left) ─────────────────── */
+/* ── Guide panel ── */
 .guide-panel {
     width: 158px;
     flex-shrink: 0;
-    background: #263238;
+    background: var(--bg-guide);
+    border: var(--border-panel);
     border-radius: 8px 8px 0 0;
     overflow-y: auto;
     box-shadow: 0 1px 4px rgba(0,0,0,.18);
     padding-bottom: 8px;
+    transition: background .2s;
 }
 .guide-head {
     padding: 6px 12px;
     font-size: 0.76rem;
-    color: #cfd8dc;
-    border-bottom: 1px solid #37474f;
+    color: var(--fg-panel-head);
+    border-bottom: 1px solid var(--bd-guide);
     position: sticky;
     top: 0;
-    background: #263238;
+    background: var(--bg-guide);
 }
-.guide-section {
-    padding: 8px 12px 4px;
-}
-.guide-section + .guide-section {
-    border-top: 1px solid #37474f;
-}
+.guide-section { padding: 8px 12px 4px; }
+.guide-section + .guide-section { border-top: 1px solid var(--bd-guide); }
 .guide-state {
     font-size: 0.68rem;
-    color: #546e7a;
+    color: var(--fg-guide-state);
     text-transform: uppercase;
     letter-spacing: 0.05em;
     margin-bottom: 5px;
@@ -290,11 +446,10 @@ header {
     align-items: baseline;
     gap: 7px;
     padding: 3px 0;
-    font-size: 0.8rem;
 }
 .guide-key {
-    background: #37474f;
-    color: #eceff1;
+    background: var(--bg-guide-key);
+    color: var(--fg-guide-key);
     border-radius: 4px;
     padding: 1px 6px;
     font-family: "Courier New", monospace;
@@ -302,26 +457,25 @@ header {
     white-space: nowrap;
     flex-shrink: 0;
 }
-.guide-key.green  { background: #1b5e20; }
-.guide-key.orange { background: #e65100; }
-.guide-key.blue   { background: #1565c0; }
-.guide-key.purple { background: #6a1b9a; }
-.guide-key.red    { background: #b71c1c; }
-.guide-key.teal   { background: #00695c; }
+.guide-key.green  { background: var(--bg-key-enter); }
+.guide-key.orange { background: var(--bg-key-minus); }
+.guide-key.blue   { background: var(--bg-key-plus); }
+.guide-key.purple { background: var(--bg-key-00); }
+.guide-key.red    { background: var(--bg-key-bs); }
+.guide-key.teal   { background: var(--bg-key-hist); }
+.guide-key.gray   { background: var(--bg-key-theme); }
 .guide-desc {
-    color: #90a4ae;
+    color: var(--fg-guide-desc);
     font-size: 0.78rem;
     line-height: 1.3;
 }
 
-/* ── History panel ───────────────────────── */
+/* ── History panel ── */
 .history-panel {
     position: fixed;
-    top: 44px;
-    right: 0;
-    bottom: 0;
+    top: 44px; right: 0; bottom: 0;
     width: 480px;
-    background: #fff;
+    background: var(--bg-hist-panel);
     box-shadow: -4px 0 24px rgba(0,0,0,.22);
     display: flex;
     flex-direction: column;
@@ -329,14 +483,10 @@ header {
     transform: translateX(0);
     transition: transform .2s ease;
 }
-.history-panel.hidden {
-    transform: translateX(100%);
-    pointer-events: none;
-}
-
+.history-panel.hidden { transform: translateX(100%); pointer-events: none; }
 .hist-head {
-    background: #263238;
-    color: #eceff1;
+    background: var(--bg-hist-head);
+    color: var(--fg-hist-head);
     padding: 10px 14px;
     display: flex;
     align-items: center;
@@ -357,28 +507,23 @@ header {
 .hist-btn:hover { background: #455a64; }
 .hist-btn.danger { background: #b71c1c; }
 .hist-btn.danger:hover { background: #c62828; }
-
 .hist-summary {
     padding: 8px 14px;
     font-size: 0.78rem;
-    color: #78909c;
-    background: #f5f5f5;
-    border-bottom: 1px solid #e0e0e0;
+    color: var(--fg-hist-summary);
+    background: var(--bg-hist-summary);
+    border-bottom: 1px solid var(--border-row);
     flex-shrink: 0;
 }
-.hist-summary span { color: #263238; font-weight: bold; }
-
+.hist-summary span { color: var(--fg-hist-strong); font-weight: bold; }
 .hist-list { flex: 1; overflow-y: auto; }
-
 .hist-empty {
     padding: 32px;
     text-align: center;
-    color: #b0bec5;
+    color: var(--fg-empty);
     font-size: 0.9rem;
 }
-
-.hist-receipt { border-bottom: 1px solid #eeeeee; }
-
+.hist-receipt { border-bottom: 1px solid var(--border-row); }
 .hist-receipt-head {
     display: grid;
     grid-template-columns: 1fr auto auto 20px;
@@ -388,51 +533,49 @@ header {
     align-items: center;
     font-size: 0.85rem;
 }
-.hist-receipt-head:hover { background: #f5f5f5; }
-
-.h-no   { color: #546e7a; font-family: monospace; font-size: 0.82rem; }
-.h-dt   { color: #90a4ae; font-size: 0.78rem; }
-.h-tot  { color: #263238; font-weight: bold; }
+.hist-receipt-head:hover { background: var(--bg-hist-row-hov); }
+.h-no   { color: var(--fg-hist-no); font-family: monospace; font-size: 0.82rem; }
+.h-dt   { color: var(--fg-hist-dt); font-size: 0.78rem; }
+.h-tot  { color: var(--fg-hist-tot); font-weight: bold; }
 .h-arr  { color: #b0bec5; font-size: 0.75rem; transition: transform .15s; }
 .h-arr.open { transform: rotate(180deg); }
-
 .hist-receipt-body {
-    background: #fafafa;
-    border-top: 1px solid #f0f0f0;
+    background: var(--bg-hist-body);
+    border-top: 1px solid var(--border-row);
     padding: 6px 14px 10px;
     display: none;
 }
 .hist-receipt-body.open { display: block; }
-
 .h-item {
     display: grid;
     grid-template-columns: 1fr 36px 56px 64px;
     gap: 4px;
     padding: 3px 0;
     font-size: 0.82rem;
-    color: #546e7a;
+    color: var(--fg-hist-item);
     text-align: right;
 }
-.h-item span:first-child { text-align: left; color: #37474f; }
-
-.h-divider { border: none; border-top: 1px dashed #e0e0e0; margin: 6px 0; }
-
+.h-item span:first-child { text-align: left; color: var(--fg-hist-strong); }
+.h-divider { border: none; border-top: 1px dashed var(--border-row); margin: 6px 0; }
 .h-foot {
     display: flex;
     justify-content: flex-end;
     gap: 16px;
     font-size: 0.82rem;
-    color: #546e7a;
+    color: var(--fg-hist-item);
     padding-top: 2px;
 }
-.h-foot strong { color: #263238; }
+.h-foot strong { color: var(--fg-hist-strong); }
 </style>
 </head>
 <body>
 
 <header>
     テンキーレジシステム
-    <span class="header-count" id="headerCount">本日 <span>0</span> 件</span>
+    <div class="header-right">
+        <span class="header-count" id="headerCount">本日 <span>0</span> 件</span>
+        <button id="themeBtn" class="theme-btn" onclick="nextTheme()">◑ ハイコントラスト</button>
+    </div>
 </header>
 
 <div class="panels">
@@ -487,6 +630,10 @@ header {
                 <span class="guide-key teal">履歴</span>
                 <span class="guide-desc">レシート履歴を開閉</span>
             </div>
+            <div class="guide-item">
+                <span class="guide-key gray">÷</span>
+                <span class="guide-desc">表示テーマ切替</span>
+            </div>
         </div>
     </div>
 
@@ -532,7 +679,7 @@ header {
         <button class="k"        onclick="press('5')">5</button>
         <button class="k"        onclick="press('6')">6</button>
         <button class="k k-00"   onclick="press('00')">00</button>
-        <button class="k k-off"  title="未使用（将来のオプション）">÷</button>
+        <button class="k k-theme" onclick="press('/')">÷</button>
         <!-- row 3 -->
         <button class="k"          onclick="press('1')">1</button>
         <button class="k"          onclick="press('2')">2</button>
@@ -806,6 +953,8 @@ function playDrawer() {
 function press(key) {
     // * キーは状態によらず履歴トグル
     if (key === '*') { toggleHistory(); return; }
+    // / キーは状態によらずテーマ切替
+    if (key === '/') { nextTheme(); return; }
 
     switch (state) {
         case S.CODE:    onCode(key);       break;
@@ -839,8 +988,6 @@ function onCode(key) {
         state = S.CHG_QTY;
         return;
     }
-    if (key === '/') return; // 未使用
-
     if (key === 'Enter') {
         if (input === '') return;
         if (input === '00') {
@@ -988,7 +1135,7 @@ function renderDisplay() {
                 : '';
             label.textContent = '商品コード入力  /  [00]=会計  /  [－]=直前削除  /  [＋]=数量変更  /  [履歴]=レシート一覧';
             val.innerHTML = `<span>${input || '__'}</span>`
-                + `<span style="font-size:0.85rem;color:#42a5f5;margin-left:14px">${preview}</span>`;
+                + `<span style="font-size:0.85rem;color:var(--fg-msg-info);margin-left:14px">${preview}</span>`;
             break;
         }
         case S.QTY:
@@ -996,8 +1143,8 @@ function renderDisplay() {
             if (input) {
                 val.textContent = input;
             } else {
-                val.innerHTML = '<span style="color:#37474f">1</span>'
-                    + '<span style="font-size:0.8rem;color:#37474f;margin-left:10px;letter-spacing:0">← Enterでそのまま確定</span>';
+                val.innerHTML = '<span style="color:var(--fg-disp-ph)">1</span>'
+                    + '<span style="font-size:0.8rem;color:var(--fg-disp-ph);margin-left:10px;letter-spacing:0">← Enterでそのまま確定</span>';
             }
             break;
         case S.CHG_QTY: {
@@ -1015,7 +1162,7 @@ function renderDisplay() {
             const change = paid - total;
             label.textContent = '会計完了  /  [Enter] で次のお客様へ';
             val.innerHTML = `
-                <span style="font-size:0.82rem;color:#546e7a;display:block;margin-bottom:2px">
+                <span style="font-size:0.82rem;color:var(--fg-disp-lbl);display:block;margin-bottom:2px">
                     合計 ¥${fmt(total)} &nbsp;/&nbsp; お預かり ¥${fmt(paid)}
                 </span>
                 <span>お釣り ¥${fmt(change)}</span>
@@ -1071,7 +1218,34 @@ document.addEventListener('keydown', e => {
     if (k) { e.preventDefault(); press(k); }
 });
 
+// ─── テーマ ──────────────────────────────────────────────────
+const THEMES = [
+    { id: 'dark', label: 'ダーク' },
+    { id: 'hc',   label: 'ハイコントラスト' },
+];
+let themeIdx = 0;
+
+function nextTheme() {
+    themeIdx = (themeIdx + 1) % THEMES.length;
+    applyTheme();
+}
+
+function applyTheme() {
+    THEMES.forEach(t => document.body.classList.remove(t.id));
+    if (THEMES[themeIdx].id !== 'dark') document.body.classList.add(THEMES[themeIdx].id);
+    localStorage.setItem('register_theme', THEMES[themeIdx].id);
+    const btn  = document.getElementById('themeBtn');
+    const next = THEMES[(themeIdx + 1) % THEMES.length];
+    if (btn) btn.textContent = `◑ ${next.label}`;
+}
+
 // ─── 初期化 ───────────────────────────────────────────────────
+(function () {
+    const saved = localStorage.getItem('register_theme') || 'dark';
+    themeIdx = THEMES.findIndex(t => t.id === saved);
+    if (themeIdx < 0) themeIdx = 0;
+    applyTheme();
+})();
 renderProductList();
 renderHeaderCount();
 render();
