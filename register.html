@@ -28,6 +28,18 @@ header {
     font-weight: bold;
     letter-spacing: 0.06em;
     flex-shrink: 0;
+    gap: 12px;
+}
+.header-count {
+    margin-left: auto;
+    font-size: 0.78rem;
+    font-weight: normal;
+    color: #78909c;
+    letter-spacing: 0;
+}
+.header-count span {
+    color: #ffca28;
+    font-weight: bold;
 }
 
 /* ── Panels (top half) ───────────────────── */
@@ -63,10 +75,7 @@ header {
 }
 .r { text-align: right; }
 
-.cart-body {
-    flex: 1;
-    overflow-y: auto;
-}
+.cart-body { flex: 1; overflow-y: auto; }
 
 .cart-empty {
     padding: 28px;
@@ -111,7 +120,6 @@ header {
     overflow-y: auto;
     box-shadow: 0 1px 4px rgba(0,0,0,.12);
 }
-
 .product-head {
     background: #37474f;
     color: #cfd8dc;
@@ -121,7 +129,6 @@ header {
     top: 0;
     z-index: 1;
 }
-
 .product-row {
     display: grid;
     grid-template-columns: 30px 1fr auto;
@@ -158,7 +165,6 @@ header {
     min-width: 0;
     align-self: stretch;
 }
-
 .d-label {
     font-size: 0.72rem;
     color: #546e7a;
@@ -167,7 +173,6 @@ header {
     overflow: hidden;
     text-overflow: ellipsis;
 }
-
 .d-value {
     font-family: "Courier New", Courier, monospace;
     font-size: 1.9rem;
@@ -176,17 +181,10 @@ header {
     line-height: 1.2;
     min-height: 2.3rem;
 }
-
-.d-msg {
-    font-size: 0.82rem;
-    min-height: 1.1em;
-    color: transparent;
-}
+.d-msg { font-size: 0.82rem; min-height: 1.1em; color: transparent; }
 .d-msg.error   { color: #ef5350; }
 .d-msg.success { color: #66bb6a; }
 .d-msg.info    { color: #42a5f5; }
-
-/* Change state highlight */
 .display.done .d-label { color: #ffa726; }
 .display.done .d-value { color: #ffa726; }
 
@@ -198,7 +196,6 @@ header {
     gap: 5px;
     flex-shrink: 0;
 }
-
 .k {
     background: #455a64;
     color: #eceff1;
@@ -233,6 +230,10 @@ header {
 .k-plus:hover  { background: #1976d2; }
 .k-plus:active { background: #0d47a1; }
 
+.k-hist  { background: #00695c; font-size: 0.82rem; }
+.k-hist:hover  { background: #00796b; }
+.k-hist:active { background: #004d40; }
+
 .k-enter {
     background: #1b5e20;
     font-size: 0.95rem;
@@ -251,15 +252,129 @@ header {
 }
 .k-off:hover  { background: #37474f; }
 .k-off:active { transform: none; }
+
+/* ── History panel ───────────────────────── */
+.history-panel {
+    position: fixed;
+    top: 44px;
+    right: 0;
+    bottom: 0;
+    width: 480px;
+    background: #fff;
+    box-shadow: -4px 0 24px rgba(0,0,0,.22);
+    display: flex;
+    flex-direction: column;
+    z-index: 200;
+    transform: translateX(0);
+    transition: transform .2s ease;
+}
+.history-panel.hidden {
+    transform: translateX(100%);
+    pointer-events: none;
+}
+
+.hist-head {
+    background: #263238;
+    color: #eceff1;
+    padding: 10px 14px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-shrink: 0;
+}
+.hist-head-title { font-weight: bold; font-size: 0.95rem; flex: 1; }
+.hist-btn {
+    background: #37474f;
+    color: #eceff1;
+    border: none;
+    border-radius: 5px;
+    padding: 5px 10px;
+    font-size: 0.78rem;
+    cursor: pointer;
+    white-space: nowrap;
+}
+.hist-btn:hover { background: #455a64; }
+.hist-btn.danger { background: #b71c1c; }
+.hist-btn.danger:hover { background: #c62828; }
+
+.hist-summary {
+    padding: 8px 14px;
+    font-size: 0.78rem;
+    color: #78909c;
+    background: #f5f5f5;
+    border-bottom: 1px solid #e0e0e0;
+    flex-shrink: 0;
+}
+.hist-summary span { color: #263238; font-weight: bold; }
+
+.hist-list { flex: 1; overflow-y: auto; }
+
+.hist-empty {
+    padding: 32px;
+    text-align: center;
+    color: #b0bec5;
+    font-size: 0.9rem;
+}
+
+.hist-receipt { border-bottom: 1px solid #eeeeee; }
+
+.hist-receipt-head {
+    display: grid;
+    grid-template-columns: 1fr auto auto 20px;
+    gap: 8px;
+    padding: 9px 14px;
+    cursor: pointer;
+    align-items: center;
+    font-size: 0.85rem;
+}
+.hist-receipt-head:hover { background: #f5f5f5; }
+
+.h-no   { color: #546e7a; font-family: monospace; font-size: 0.82rem; }
+.h-dt   { color: #90a4ae; font-size: 0.78rem; }
+.h-tot  { color: #263238; font-weight: bold; }
+.h-arr  { color: #b0bec5; font-size: 0.75rem; transition: transform .15s; }
+.h-arr.open { transform: rotate(180deg); }
+
+.hist-receipt-body {
+    background: #fafafa;
+    border-top: 1px solid #f0f0f0;
+    padding: 6px 14px 10px;
+    display: none;
+}
+.hist-receipt-body.open { display: block; }
+
+.h-item {
+    display: grid;
+    grid-template-columns: 1fr 36px 56px 64px;
+    gap: 4px;
+    padding: 3px 0;
+    font-size: 0.82rem;
+    color: #546e7a;
+    text-align: right;
+}
+.h-item span:first-child { text-align: left; color: #37474f; }
+
+.h-divider { border: none; border-top: 1px dashed #e0e0e0; margin: 6px 0; }
+
+.h-foot {
+    display: flex;
+    justify-content: flex-end;
+    gap: 16px;
+    font-size: 0.82rem;
+    color: #546e7a;
+    padding-top: 2px;
+}
+.h-foot strong { color: #263238; }
 </style>
 </head>
 <body>
 
-<header>テンキーレジシステム</header>
+<header>
+    テンキーレジシステム
+    <span class="header-count" id="headerCount">本日 <span>0</span> 件</span>
+</header>
 
 <div class="panels">
-
-    <!-- Cart panel -->
     <div class="cart-panel">
         <div class="cart-head">
             <span>No</span>
@@ -277,48 +392,54 @@ header {
         </div>
     </div>
 
-    <!-- Product list panel -->
     <div class="product-panel">
         <div class="product-head">商品一覧</div>
         <div id="productList"></div>
     </div>
-
 </div>
 
 <div class="controls">
-
-    <!-- Display -->
     <div class="display" id="display">
-        <div class="d-label"  id="dLabel">商品コードを入力してください</div>
-        <div class="d-value"  id="dValue">__</div>
-        <div class="d-msg"    id="dMsg"></div>
+        <div class="d-label" id="dLabel">商品コードを入力してください</div>
+        <div class="d-value" id="dValue">__</div>
+        <div class="d-msg"   id="dMsg"></div>
     </div>
 
-    <!-- Numpad (5×4 grid) -->
     <div class="numpad">
         <!-- row 1 -->
-        <button class="k"       onclick="press('7')">7</button>
-        <button class="k"       onclick="press('8')">8</button>
-        <button class="k"       onclick="press('9')">9</button>
-        <button class="k k-bs"  onclick="press('BS')">BS</button>
-        <button class="k k-off" title="未使用（将来のオプション）">✕</button>
+        <button class="k"        onclick="press('7')">7</button>
+        <button class="k"        onclick="press('8')">8</button>
+        <button class="k"        onclick="press('9')">9</button>
+        <button class="k k-bs"   onclick="press('BS')">BS</button>
+        <button class="k k-hist" onclick="press('*')">履歴</button>
         <!-- row 2 -->
-        <button class="k"       onclick="press('4')">4</button>
-        <button class="k"       onclick="press('5')">5</button>
-        <button class="k"       onclick="press('6')">6</button>
-        <button class="k k-00"  onclick="press('00')">00</button>
-        <button class="k k-off" title="未使用（将来のオプション）">÷</button>
+        <button class="k"        onclick="press('4')">4</button>
+        <button class="k"        onclick="press('5')">5</button>
+        <button class="k"        onclick="press('6')">6</button>
+        <button class="k k-00"   onclick="press('00')">00</button>
+        <button class="k k-off"  title="未使用（将来のオプション）">÷</button>
         <!-- row 3 -->
-        <button class="k"         onclick="press('1')">1</button>
-        <button class="k"         onclick="press('2')">2</button>
-        <button class="k"         onclick="press('3')">3</button>
-        <button class="k k-minus" onclick="press('-')">－</button>
-        <button class="k k-plus"  onclick="press('+')">＋</button>
+        <button class="k"          onclick="press('1')">1</button>
+        <button class="k"          onclick="press('2')">2</button>
+        <button class="k"          onclick="press('3')">3</button>
+        <button class="k k-minus"  onclick="press('-')">－</button>
+        <button class="k k-plus"   onclick="press('+')">＋</button>
         <!-- row 4 -->
-        <button class="k k-zero"  onclick="press('0')">0</button>
-        <button class="k k-enter" onclick="press('Enter')">確定 Enter</button>
+        <button class="k k-zero"   onclick="press('0')">0</button>
+        <button class="k k-enter"  onclick="press('Enter')">確定 Enter</button>
     </div>
+</div>
 
+<!-- ── History panel ─────────────────────── -->
+<div class="history-panel hidden" id="historyPanel">
+    <div class="hist-head">
+        <span class="hist-head-title">レシート履歴</span>
+        <button class="hist-btn" onclick="exportCSV()">CSV 保存</button>
+        <button class="hist-btn danger" onclick="clearAllReceipts()">全件削除</button>
+        <button class="hist-btn" onclick="toggleHistory()">✕ 閉じる</button>
+    </div>
+    <div class="hist-summary" id="histSummary"></div>
+    <div class="hist-list" id="histList"></div>
 </div>
 
 <script>
@@ -348,18 +469,18 @@ const PRODUCTS = {
 
 // ─── 状態 ─────────────────────────────────────────────────────
 const S = {
-    CODE:    'CODE',     // 商品コード入力待ち
-    QTY:     'QTY',      // 数量入力待ち
-    CHG_QTY: 'CHG_QTY', // 数量変更入力待ち（＋キー）
-    PAYMENT: 'PAYMENT',  // お預かり金額入力待ち
-    CHANGE:  'CHANGE',   // お釣り表示
+    CODE:    'CODE',
+    QTY:     'QTY',
+    CHG_QTY: 'CHG_QTY',
+    PAYMENT: 'PAYMENT',
+    CHANGE:  'CHANGE',
 };
 
 let state   = S.CODE;
 let input   = '';
-let cart    = [];          // [{code,name,qty,price,subtotal}]
-let selProd = null;        // 選択中の商品
-let paid    = 0;           // お預かり金額
+let cart    = [];
+let selProd = null;
+let paid    = 0;
 
 let msgText  = '';
 let msgType  = 'info';
@@ -372,19 +493,153 @@ function setMsg(text, type = 'info') {
     msgTimer = setTimeout(() => { msgText = ''; render(); }, 3500);
 }
 
+// ─── localStorage ─────────────────────────────────────────────
+const STORAGE_KEY = 'register_receipts';
+
+function loadReceipts() {
+    try { return JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]'); }
+    catch { return []; }
+}
+
+function saveReceiptToStorage(receipt) {
+    const receipts = loadReceipts();
+    receipts.push(receipt);
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(receipts));
+}
+
+/** YYYYMMDD-NNN 形式のレシート番号を生成 */
+function generateReceiptNo() {
+    const d = new Date();
+    const dateStr = `${d.getFullYear()}${String(d.getMonth()+1).padStart(2,'0')}${String(d.getDate()).padStart(2,'0')}`;
+    const todayCount = loadReceipts().filter(r => r.receiptNo.startsWith(dateStr)).length;
+    return `${dateStr}-${String(todayCount + 1).padStart(3, '0')}`;
+}
+
+function todayReceiptCount() {
+    const d = new Date();
+    const dateStr = `${d.getFullYear()}${String(d.getMonth()+1).padStart(2,'0')}${String(d.getDate()).padStart(2,'0')}`;
+    return loadReceipts().filter(r => r.receiptNo.startsWith(dateStr)).length;
+}
+
+function clearAllReceipts() {
+    if (!confirm('レシート履歴を全件削除しますか？')) return;
+    localStorage.removeItem(STORAGE_KEY);
+    renderHistory();
+    renderHeaderCount();
+}
+
+// ─── CSV エクスポート ─────────────────────────────────────────
+function exportCSV() {
+    const receipts = loadReceipts();
+    if (receipts.length === 0) { alert('レシートがありません'); return; }
+
+    const rows = [
+        ['レシート番号', '日時', '商品コード', '商品名', '数量', '単価', '小計', '合計', 'お預かり', 'お釣り'],
+    ];
+    for (const r of receipts) {
+        for (const item of r.items) {
+            rows.push([
+                r.receiptNo, r.datetime,
+                item.code, item.name, item.qty, item.price, item.subtotal,
+                r.total, r.payment, r.change,
+            ]);
+        }
+    }
+
+    // BOM付きUTF-8でExcelでも日本語が文字化けしない
+    const csv = '\uFEFF' + rows.map(row =>
+        row.map(v => `"${String(v).replace(/"/g, '""')}"`).join(',')
+    ).join('\r\n');
+
+    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8' });
+    const url  = URL.createObjectURL(blob);
+    const a    = document.createElement('a');
+    const d    = new Date();
+    a.href     = url;
+    a.download = `receipts_${d.getFullYear()}${String(d.getMonth()+1).padStart(2,'0')}${String(d.getDate()).padStart(2,'0')}.csv`;
+    a.click();
+    URL.revokeObjectURL(url);
+}
+
+// ─── 履歴パネル ───────────────────────────────────────────────
+let historyOpen = false;
+
+function toggleHistory() {
+    historyOpen = !historyOpen;
+    const panel = document.getElementById('historyPanel');
+    if (historyOpen) {
+        renderHistory();
+        panel.classList.remove('hidden');
+    } else {
+        panel.classList.add('hidden');
+    }
+}
+
+function renderHistory() {
+    const receipts = loadReceipts().slice().reverse(); // 新しい順
+    const listEl   = document.getElementById('histList');
+    const sumEl    = document.getElementById('histSummary');
+
+    // サマリー
+    const total = receipts.reduce((s, r) => s + r.total, 0);
+    sumEl.innerHTML = `全 <span>${receipts.length}</span> 件  /  合計売上 <span>¥${fmt(total)}</span>`;
+
+    if (receipts.length === 0) {
+        listEl.innerHTML = '<div class="hist-empty">レシートがありません</div>';
+        return;
+    }
+
+    listEl.innerHTML = receipts.map(r => `
+        <div class="hist-receipt">
+            <div class="hist-receipt-head" onclick="toggleReceiptBody('${r.receiptNo}')">
+                <span>
+                    <span class="h-no">${r.receiptNo}</span>&ensp;
+                    <span class="h-dt">${r.datetime}</span>
+                </span>
+                <span class="h-tot">¥${fmt(r.total)}</span>
+                <span style="font-size:0.78rem;color:#90a4ae">${r.items.length}品</span>
+                <span class="h-arr" id="arr-${r.receiptNo}">▼</span>
+            </div>
+            <div class="hist-receipt-body" id="body-${r.receiptNo}">
+                ${r.items.map(item => `
+                    <div class="h-item">
+                        <span>${item.name}</span>
+                        <span>${item.qty}</span>
+                        <span>¥${fmt(item.price)}</span>
+                        <span>¥${fmt(item.subtotal)}</span>
+                    </div>
+                `).join('')}
+                <hr class="h-divider">
+                <div class="h-foot">
+                    <span>合計 <strong>¥${fmt(r.total)}</strong></span>
+                    <span>お預かり <strong>¥${fmt(r.payment)}</strong></span>
+                    <span>お釣り <strong>¥${fmt(r.change)}</strong></span>
+                </div>
+            </div>
+        </div>
+    `).join('');
+}
+
+function toggleReceiptBody(no) {
+    document.getElementById(`body-${no}`).classList.toggle('open');
+    document.getElementById(`arr-${no}`).classList.toggle('open');
+}
+
 // ─── キー処理 ─────────────────────────────────────────────────
 function press(key) {
+    // * キーは状態によらず履歴トグル
+    if (key === '*') { toggleHistory(); return; }
+
     switch (state) {
-        case S.CODE:    onCode(key);    break;
-        case S.QTY:     onQty(key);     break;
-        case S.CHG_QTY: onChgQty(key);  break;
-        case S.PAYMENT: onPayment(key); break;
+        case S.CODE:    onCode(key);       break;
+        case S.QTY:     onQty(key);        break;
+        case S.CHG_QTY: onChgQty(key);     break;
+        case S.PAYMENT: onPayment(key);    break;
         case S.CHANGE:  onChangeDone(key); break;
     }
     render();
 }
 
-/** 最大 maxLen 文字まで input に追記する（"00" は 2 文字分） */
 function appendDigits(key, maxLen) {
     const digits = key === '00' ? '00' : key;
     const space  = maxLen - input.length;
@@ -407,32 +662,23 @@ function onCode(key) {
         state = S.CHG_QTY;
         return;
     }
-    if (key === '*' || key === '/') return; // 未使用
+    if (key === '/') return; // 未使用
 
     if (key === 'Enter') {
-        if (input === '') return; // 空エンターは無視
+        if (input === '') return;
         if (input === '00') {
             if (cart.length === 0) { setMsg('商品が登録されていません', 'error'); input = ''; return; }
             input = '';
             state = S.PAYMENT;
             return;
         }
-        if (input.length !== 2) {
-            setMsg('2桁の商品コードを入力してください', 'error');
-            input = '';
-            return;
-        }
-        if (!PRODUCTS[input]) {
-            setMsg(`[${input}] は登録されていない商品コードです`, 'error');
-            input = '';
-            return;
-        }
+        if (input.length !== 2) { setMsg('2桁の商品コードを入力してください', 'error'); input = ''; return; }
+        if (!PRODUCTS[input])   { setMsg(`[${input}] は登録されていない商品コードです`, 'error'); input = ''; return; }
         selProd = { code: input, ...PRODUCTS[input] };
         input   = '';
         state   = S.QTY;
         return;
     }
-
     if (/^\d$/.test(key) || key === '00') appendDigits(key, 2);
 }
 
@@ -440,11 +686,7 @@ function onQty(key) {
     if (key === 'BS') { input = input.slice(0, -1); return; }
     if (key === 'Enter') {
         const qty = parseInt(input, 10);
-        if (!input || qty < 1 || qty > 999) {
-            setMsg('数量は 1〜999 で入力してください', 'error');
-            input = '';
-            return;
-        }
+        if (!input || qty < 1 || qty > 999) { setMsg('数量は 1〜999 で入力してください', 'error'); input = ''; return; }
         const subtotal = qty * selProd.price;
         cart.push({ code: selProd.code, name: selProd.name, qty, price: selProd.price, subtotal });
         setMsg(`「${selProd.name}」× ${qty} = ¥${fmt(subtotal)} をカートに追加`, 'success');
@@ -460,11 +702,7 @@ function onChgQty(key) {
     if (key === 'BS') { input = input.slice(0, -1); return; }
     if (key === 'Enter') {
         const qty = parseInt(input, 10);
-        if (!input || qty < 1 || qty > 999) {
-            setMsg('数量は 1〜999 で入力してください', 'error');
-            input = '';
-            return;
-        }
+        if (!input || qty < 1 || qty > 999) { setMsg('数量は 1〜999 で入力してください', 'error'); input = ''; return; }
         const item    = cart[cart.length - 1];
         item.qty      = qty;
         item.subtotal = qty * item.price;
@@ -481,15 +719,8 @@ function onPayment(key) {
     if (key === 'Enter') {
         const total   = cartTotal();
         const payment = parseInt(input, 10);
-        if (!input || payment <= 0) {
-            setMsg('金額を入力してください', 'error');
-            input = '';
-            return;
-        }
-        if (payment < total) {
-            setMsg(`¥${fmt(total - payment)} 不足しています`, 'error');
-            return;
-        }
+        if (!input || payment <= 0) { setMsg('金額を入力してください', 'error'); input = ''; return; }
+        if (payment < total) { setMsg(`¥${fmt(total - payment)} 不足しています`, 'error'); return; }
         paid  = payment;
         state = S.CHANGE;
         return;
@@ -499,6 +730,21 @@ function onPayment(key) {
 
 function onChangeDone(key) {
     if (key === 'Enter') {
+        // レシートを保存してからリセット
+        const total  = cartTotal();
+        const change = paid - total;
+        const now    = new Date();
+        const datetime = `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}-${String(now.getDate()).padStart(2,'0')} `
+                       + `${String(now.getHours()).padStart(2,'0')}:${String(now.getMinutes()).padStart(2,'0')}`;
+        saveReceiptToStorage({
+            receiptNo: generateReceiptNo(),
+            datetime,
+            items: cart.map(({ code, name, qty, price, subtotal }) => ({ code, name, qty, price, subtotal })),
+            total,
+            payment: paid,
+            change,
+        });
+
         cart    = [];
         input   = '';
         selProd = null;
@@ -506,21 +752,25 @@ function onChangeDone(key) {
         msgText = '';
         if (msgTimer) clearTimeout(msgTimer);
         state = S.CODE;
+
+        renderHeaderCount();
+        if (historyOpen) renderHistory(); // パネルが開いていれば更新
     }
 }
 
 // ─── ユーティリティ ────────────────────────────────────────────
-function cartTotal() {
-    return cart.reduce((s, item) => s + item.subtotal, 0);
-}
-function fmt(n) {
-    return n.toLocaleString('ja-JP');
-}
+function cartTotal() { return cart.reduce((s, i) => s + i.subtotal, 0); }
+function fmt(n) { return n.toLocaleString('ja-JP'); }
 
 // ─── 描画 ─────────────────────────────────────────────────────
 function render() {
     renderCart();
     renderDisplay();
+}
+
+function renderHeaderCount() {
+    const cnt = todayReceiptCount();
+    document.getElementById('headerCount').innerHTML = `本日 <span>${cnt}</span> 件`;
 }
 
 function renderCart() {
@@ -554,11 +804,10 @@ function renderDisplay() {
 
     switch (state) {
         case S.CODE: {
-            // 2桁入力済みなら商品名をプレビュー表示
             const preview = (input.length === 2 && PRODUCTS[input])
                 ? ` → ${PRODUCTS[input].name}  ¥${fmt(PRODUCTS[input].price)}`
                 : '';
-            label.textContent = '商品コード入力  /  [00]=会計  /  [－]=直前削除  /  [＋]=数量変更';
+            label.textContent = '商品コード入力  /  [00]=会計  /  [－]=直前削除  /  [＋]=数量変更  /  [履歴]=レシート一覧';
             val.innerHTML = `<span>${input || '__'}</span>`
                 + `<span style="font-size:0.85rem;color:#42a5f5;margin-left:14px">${preview}</span>`;
             break;
@@ -640,6 +889,7 @@ document.addEventListener('keydown', e => {
 
 // ─── 初期化 ───────────────────────────────────────────────────
 renderProductList();
+renderHeaderCount();
 render();
 </script>
 </body>
