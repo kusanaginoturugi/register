@@ -37,7 +37,7 @@
     --fg-p-price:      #c62828;
 
     --bg-display:      #1c2833;
-    --fg-disp-lbl:     #546e7a;
+    --fg-disp-lbl:     #90b8cc;
     --fg-disp-val:     #00e676;
     --fg-disp-ph:      #2a4050;   /* 数量デフォルト"1"の色 */
     --fg-disp-done:    #ffa726;
@@ -106,7 +106,7 @@ body.hc {
     --fg-p-price:      #aa0000;
 
     --bg-display:      #000066;
-    --fg-disp-lbl:     #8899ff;
+    --fg-disp-lbl:     #bbccff;
     --fg-disp-val:     #ffff00;
     --fg-disp-ph:      #223388;
     --fg-disp-done:    #ff9900;
@@ -175,7 +175,7 @@ body.light {
     --fg-p-price:      #c62828;
 
     --bg-display:      #e3f2fd;
-    --fg-disp-lbl:     #5c8db8;
+    --fg-disp-lbl:     #1a5276;
     --fg-disp-val:     #0d47a1;
     --fg-disp-ph:      #90c4e8;
     --fg-disp-done:    #e65100;
@@ -244,7 +244,7 @@ body.outdoor {
     --fg-p-price:      #cc0000;
 
     --bg-display:      #ffffff;
-    --fg-disp-lbl:     #555555;
+    --fg-disp-lbl:     #111111;
     --fg-disp-val:     #000000;
     --fg-disp-ph:      #bbbbbb;
     --fg-disp-done:    #cc5500;
@@ -445,8 +445,6 @@ header {
 .controls {
     padding: 8px;
     display: flex;
-    gap: 8px;
-    align-items: flex-start;
     flex-shrink: 0;
 }
 
@@ -455,19 +453,19 @@ header {
     flex: 1;
     background: var(--bg-display);
     border-radius: 8px;
-    padding: 12px 18px;
+    padding: 14px 20px;
     display: flex;
     flex-direction: column;
     justify-content: center;
-    gap: 5px;
+    gap: 6px;
     min-width: 0;
-    align-self: stretch;
     transition: background .2s;
 }
 .d-label {
-    font-size: 0.72rem;
+    font-size: 0.9rem;
+    font-weight: 600;
     color: var(--fg-disp-lbl);
-    letter-spacing: 0.04em;
+    letter-spacing: 0.03em;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
@@ -886,30 +884,6 @@ header {
         <div class="d-label" id="dLabel">商品コードを入力してください</div>
         <div class="d-value" id="dValue">__</div>
         <div class="d-msg"   id="dMsg"></div>
-    </div>
-
-    <div class="numpad">
-        <!-- row 1 -->
-        <button class="k"        onclick="press('7')">7</button>
-        <button class="k"        onclick="press('8')">8</button>
-        <button class="k"        onclick="press('9')">9</button>
-        <button class="k k-bs"   onclick="press('BS')">BS</button>
-        <button class="k k-hist" onclick="press('*')">履歴</button>
-        <!-- row 2 -->
-        <button class="k"        onclick="press('4')">4</button>
-        <button class="k"        onclick="press('5')">5</button>
-        <button class="k"        onclick="press('6')">6</button>
-        <button class="k k-00"   onclick="press('00')">00</button>
-        <button class="k k-theme" onclick="press('/')">÷</button>
-        <!-- row 3 -->
-        <button class="k"          onclick="press('1')">1</button>
-        <button class="k"          onclick="press('2')">2</button>
-        <button class="k"          onclick="press('3')">3</button>
-        <button class="k k-minus"  onclick="press('-')">－</button>
-        <button class="k k-plus"   onclick="press('+')">＋</button>
-        <!-- row 4 -->
-        <button class="k k-zero"   onclick="press('0')">0</button>
-        <button class="k k-enter"  onclick="press('Enter')">確定 Enter</button>
     </div>
 </div>
 
