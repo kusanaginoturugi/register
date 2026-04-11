@@ -711,6 +711,80 @@ header {
     padding-top: 2px;
 }
 .h-foot strong { color: var(--fg-hist-strong); }
+
+/* ── 商品マスター管理モーダル ── */
+.prod-mgr-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,.55);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 400;
+}
+.prod-mgr-overlay.hidden { display: none; }
+.prod-mgr-panel {
+    background: var(--bg-hist-panel);
+    border-radius: 10px;
+    width: 420px;
+    max-width: 92vw;
+    box-shadow: 0 8px 32px rgba(0,0,0,.35);
+    overflow: hidden;
+}
+.prod-mgr-head {
+    background: var(--bg-hist-head);
+    color: var(--fg-hist-head);
+    padding: 12px 16px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    font-weight: bold;
+    font-size: 0.95rem;
+}
+.prod-mgr-close {
+    background: transparent;
+    border: none;
+    color: var(--fg-hist-head);
+    font-size: 1.1rem;
+    cursor: pointer;
+    line-height: 1;
+    opacity: .7;
+}
+.prod-mgr-close:hover { opacity: 1; }
+.prod-mgr-body { padding: 18px; display: flex; flex-direction: column; gap: 16px; }
+.prod-mgr-info {
+    font-size: 0.84rem;
+    color: var(--fg-hist-summary);
+    background: var(--bg-hist-summary);
+    padding: 9px 13px;
+    border-radius: 6px;
+    line-height: 1.6;
+}
+.prod-mgr-info strong { color: var(--fg-hist-strong); }
+.prod-mgr-section { display: flex; flex-direction: column; gap: 7px; }
+.prod-mgr-label {
+    font-size: 0.8rem;
+    color: var(--fg-hist-item);
+    padding-left: 2px;
+}
+.mgr-btn {
+    display: inline-block;
+    padding: 9px 18px;
+    background: var(--bg-key-enter);
+    color: #fff;
+    border: none;
+    border-radius: 6px;
+    font-size: 0.85rem;
+    cursor: pointer;
+    text-align: center;
+    white-space: nowrap;
+    font-family: inherit;
+    transition: filter .1s;
+}
+.mgr-btn:hover { filter: brightness(1.12); }
+.mgr-btn.secondary { background: var(--bg-key); }
+.mgr-btn.danger    { background: var(--bg-key-bs); }
+.mgr-btn-row { display: flex; gap: 10px; flex-wrap: wrap; }
 </style>
 </head>
 <body>
@@ -719,6 +793,7 @@ header {
     テンキーレジシステム
     <div class="header-right">
         <span class="header-count" id="headerCount">本日 <span>0</span> 件</span>
+        <button class="theme-btn" onclick="openProdMgr()">商品管理</button>
         <button id="themeBtn" class="theme-btn" onclick="nextTheme()">◑ ハイコントラスト</button>
     </div>
 </header>
@@ -837,6 +912,43 @@ header {
     </div>
 </div>
 
+<!-- ── 商品マスター管理モーダル ──────────────── -->
+<div class="prod-mgr-overlay hidden" id="prodMgrOverlay" onclick="onOverlayClick(event)">
+    <div class="prod-mgr-panel">
+        <div class="prod-mgr-head">
+            <span>商品マスター管理</span>
+            <button class="prod-mgr-close" onclick="closeProdMgr()">✕</button>
+        </div>
+        <div class="prod-mgr-body">
+            <div class="prod-mgr-info" id="prodMgrInfo"></div>
+
+            <div class="prod-mgr-section">
+                <div class="prod-mgr-label">① 現在の商品データを CSV でダウンロードして編集します</div>
+                <button class="mgr-btn" onclick="exportProductsCSV()">↓ CSV をダウンロード（テンプレート）</button>
+            </div>
+
+            <div class="prod-mgr-section">
+                <div class="prod-mgr-label">② 編集した CSV を選択してインポートします</div>
+                <label>
+                    <input type="file" accept=".csv" id="productCsvInput"
+                           onchange="handleProductCsvImport(event)" style="display:none">
+                    <span class="mgr-btn" onclick="document.getElementById('productCsvInput').click()">
+                        ↑ CSV ファイルを選択してインポート
+                    </span>
+                </label>
+            </div>
+
+            <div class="prod-mgr-section">
+                <div class="prod-mgr-label">デフォルト商品データに戻す場合</div>
+                <div class="mgr-btn-row">
+                    <button class="mgr-btn danger" onclick="resetProductsToDefault()">デフォルトに戻す</button>
+                    <button class="mgr-btn secondary" onclick="closeProdMgr()">閉じる</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
 <!-- ── History panel ─────────────────────── -->
 <div class="history-panel hidden" id="historyPanel">
     <div class="hist-head">
@@ -850,8 +962,8 @@ header {
 </div>
 
 <script>
-// ─── 商品マスター ─────────────────────────────────────────────
-const PRODUCTS = {
+// ─── 商品マスター（デフォルト） ───────────────────────────────
+const DEFAULT_PRODUCTS = {
     "01": { name: "コーヒー",           price:  300 },
     "02": { name: "紅茶",               price:  280 },
     "03": { name: "オレンジジュース",    price:  250 },
@@ -873,6 +985,8 @@ const PRODUCTS = {
     "30": { name: "週刊誌",              price:  550 },
     "31": { name: "月刊誌",              price:  850 },
 };
+// 実働商品データ（localStorage またはデフォルトで初期化）
+const PRODUCTS = Object.assign({}, DEFAULT_PRODUCTS);
 
 // ─── 状態 ─────────────────────────────────────────────────────
 const S = {
@@ -933,6 +1047,137 @@ function clearAllReceipts() {
     localStorage.removeItem(STORAGE_KEY);
     renderHistory();
     renderHeaderCount();
+}
+
+// ─── 商品マスター管理 ─────────────────────────────────────────
+const PRODUCTS_STORAGE_KEY = 'register_products';
+
+function initProducts() {
+    try {
+        const stored = JSON.parse(localStorage.getItem(PRODUCTS_STORAGE_KEY));
+        if (stored && typeof stored === 'object' && Object.keys(stored).length > 0) {
+            Object.keys(PRODUCTS).forEach(k => delete PRODUCTS[k]);
+            Object.assign(PRODUCTS, stored);
+        }
+    } catch(e) {}
+}
+
+function openProdMgr() {
+    updateProdMgrInfo();
+    document.getElementById('prodMgrOverlay').classList.remove('hidden');
+}
+
+function closeProdMgr() {
+    document.getElementById('prodMgrOverlay').classList.add('hidden');
+}
+
+function onOverlayClick(e) {
+    if (e.target === document.getElementById('prodMgrOverlay')) closeProdMgr();
+}
+
+function updateProdMgrInfo() {
+    const count    = Object.keys(PRODUCTS).length;
+    const hasCustom = !!localStorage.getItem(PRODUCTS_STORAGE_KEY);
+    const src = hasCustom ? 'カスタム（localStorage）' : 'ビルトイン（デフォルト）';
+    const el = document.getElementById('prodMgrInfo');
+    if (el) el.innerHTML =
+        `商品数: <strong>${count}</strong> 件 &nbsp;／&nbsp; データ: <strong>${src}</strong><br>` +
+        `<span style="font-size:0.76rem">CSVフォーマット: コード,商品名,単価　（1行目はヘッダー）</span>`;
+}
+
+function exportProductsCSV() {
+    const rows = [['コード', '商品名', '単価']];
+    Object.entries(PRODUCTS)
+        .sort(([a], [b]) => a.localeCompare(b))
+        .forEach(([code, { name, price }]) => rows.push([code, name, price]));
+    const csv = '\uFEFF' + rows.map(r =>
+        r.map(v => `"${String(v).replace(/"/g, '""')}"`).join(',')
+    ).join('\r\n');
+    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8' });
+    const url  = URL.createObjectURL(blob);
+    const a    = document.createElement('a');
+    a.href = url;
+    a.download = 'products.csv';
+    a.click();
+    URL.revokeObjectURL(url);
+}
+
+function parseCSVLine(line) {
+    const result = [];
+    let field = '', inQuote = false;
+    for (let i = 0; i < line.length; i++) {
+        const c = line[i];
+        if (inQuote) {
+            if (c === '"' && line[i + 1] === '"') { field += '"'; i++; }
+            else if (c === '"') { inQuote = false; }
+            else { field += c; }
+        } else {
+            if (c === '"')  { inQuote = true; }
+            else if (c === ',') { result.push(field); field = ''; }
+            else { field += c; }
+        }
+    }
+    result.push(field);
+    return result;
+}
+
+function handleProductCsvImport(event) {
+    const file = event.target.files[0];
+    if (!file) return;
+    event.target.value = '';
+
+    const reader = new FileReader();
+    reader.onload = (e) => {
+        let text = e.target.result;
+        if (text.charCodeAt(0) === 0xFEFF) text = text.slice(1); // BOM除去
+
+        const lines = text.split(/\r?\n/).map(l => l.trim()).filter(l => l);
+        if (lines.length < 2) { alert('商品データがありません'); return; }
+
+        const errors = [], newProducts = {};
+        for (let i = 1; i < lines.length; i++) {
+            const parts = parseCSVLine(lines[i]);
+            if (parts.length < 3) { errors.push(`${i + 1}行目: 列が不足`); continue; }
+            const code     = parts[0].trim();
+            const name     = parts[1].trim();
+            const price    = parseInt(parts[2].trim(), 10);
+            if (!/^\d{2}$/.test(code))           { errors.push(`${i + 1}行目: コードは2桁の数字 (${code})`); continue; }
+            if (['00','98','99'].includes(code))  { errors.push(`${i + 1}行目: コード ${code} は予約済み`); continue; }
+            if (!name)                            { errors.push(`${i + 1}行目: 商品名が空`); continue; }
+            if (!Number.isInteger(price) || price <= 0) { errors.push(`${i + 1}行目: 単価が不正 (${parts[2]})`); continue; }
+            newProducts[code] = { name, price };
+        }
+
+        if (Object.keys(newProducts).length === 0) {
+            alert('有効な商品データがありません。\n\n' + errors.join('\n'));
+            return;
+        }
+        if (errors.length > 0) {
+            const preview = errors.slice(0, 5).join('\n') + (errors.length > 5 ? `\n…他 ${errors.length - 5} 件` : '');
+            if (!confirm(`${errors.length} 件のエラーがありました。\n有効な ${Object.keys(newProducts).length} 件を読み込みますか？\n\n${preview}`)) return;
+        }
+
+        Object.keys(PRODUCTS).forEach(k => delete PRODUCTS[k]);
+        Object.assign(PRODUCTS, newProducts);
+        localStorage.setItem(PRODUCTS_STORAGE_KEY, JSON.stringify(newProducts));
+
+        renderProductList();
+        updateProdMgrInfo();
+        setMsg(`${Object.keys(newProducts).length} 件の商品を読み込みました`, 'success');
+        render();
+    };
+    reader.readAsText(file, 'UTF-8');
+}
+
+function resetProductsToDefault() {
+    if (!confirm('商品データをデフォルトに戻しますか？')) return;
+    localStorage.removeItem(PRODUCTS_STORAGE_KEY);
+    Object.keys(PRODUCTS).forEach(k => delete PRODUCTS[k]);
+    Object.assign(PRODUCTS, DEFAULT_PRODUCTS);
+    renderProductList();
+    updateProdMgrInfo();
+    setMsg('商品データをデフォルトに戻しました', 'info');
+    render();
 }
 
 // ─── CSV エクスポート ─────────────────────────────────────────
@@ -1393,6 +1638,7 @@ function applyTheme() {
     if (themeIdx < 0) themeIdx = 0;
     applyTheme();
 })();
+initProducts();
 renderProductList();
 renderHeaderCount();
 render();
