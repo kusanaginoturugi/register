@@ -403,35 +403,37 @@ header {
 
 /* Product list */
 .product-panel {
-    width: 210px;
+    width: 180px;
     flex-shrink: 0;
     background: var(--bg-panel);
     border: var(--border-panel);
     border-radius: 8px 8px 0 0;
     overflow-y: auto;
+    overflow-x: hidden;
     box-shadow: 0 1px 4px rgba(0,0,0,.12);
 }
 .product-head {
     background: var(--bg-panel-head);
     color: var(--fg-panel-head);
-    padding: 6px 12px;
-    font-size: 0.76rem;
+    padding: 5px 10px;
+    font-size: 0.74rem;
     position: sticky;
     top: 0;
     z-index: 1;
 }
 .product-row {
     display: grid;
-    grid-template-columns: 30px 1fr auto;
-    gap: 4px;
-    padding: 5px 12px;
+    grid-template-columns: 26px minmax(0, 1fr) auto;
+    gap: 3px;
+    padding: 4px 10px;
     border-bottom: 1px solid var(--border-row);
-    font-size: 0.82rem;
+    font-size: 0.78rem;
     align-items: center;
 }
 .product-row:last-child { border-bottom: none; }
 .product-row:hover { background: var(--bg-row-hover); }
 .p-code  { color: var(--fg-p-code); }
+.p-name  { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; min-width: 0; }
 .p-price { color: var(--fg-p-price); font-weight: 600; white-space: nowrap; }
 
 /* ── Controls ── */
@@ -1325,7 +1327,7 @@ function renderProductList() {
         .map(([code, { name, price }]) => `
             <div class="product-row">
                 <span class="p-code">${code}</span>
-                <span>${name}</span>
+                <span class="p-name">${name}</span>
                 <span class="p-price">¥${fmt(price)}</span>
             </div>
         `).join('');
