@@ -349,7 +349,7 @@ header {
 /* Cart */
 .cart-panel {
     flex: 1;
-    max-width: 480px;
+    max-width: 380px;
     background: var(--bg-panel);
     border: var(--border-panel);
     border-radius: 8px 8px 0 0;
@@ -553,7 +553,7 @@ header {
 
 /* ── Guide panel ── */
 .guide-panel {
-    width: 112px;
+    width: 158px;
     flex-shrink: 0;
     background: var(--bg-guide);
     border: var(--border-panel);
@@ -564,36 +564,36 @@ header {
     transition: background .2s;
 }
 .guide-head {
-    padding: 5px 8px;
-    font-size: 0.72rem;
+    padding: 6px 12px;
+    font-size: 0.76rem;
     color: var(--fg-panel-head);
     border-bottom: 1px solid var(--bd-guide);
     position: sticky;
     top: 0;
     background: var(--bg-guide);
 }
-.guide-section { padding: 6px 8px 3px; }
+.guide-section { padding: 8px 12px 4px; }
 .guide-section + .guide-section { border-top: 1px solid var(--bd-guide); }
 .guide-state {
-    font-size: 0.62rem;
+    font-size: 0.68rem;
     color: var(--fg-guide-state);
     text-transform: uppercase;
-    letter-spacing: 0.04em;
-    margin-bottom: 4px;
+    letter-spacing: 0.05em;
+    margin-bottom: 5px;
 }
 .guide-item {
     display: flex;
     align-items: baseline;
-    gap: 5px;
-    padding: 2px 0;
+    gap: 7px;
+    padding: 3px 0;
 }
 .guide-key {
     background: var(--bg-guide-key);
     color: var(--fg-guide-key);
-    border-radius: 3px;
-    padding: 1px 4px;
+    border-radius: 4px;
+    padding: 1px 6px;
     font-family: "Courier New", monospace;
-    font-size: 0.72rem;
+    font-size: 0.78rem;
     white-space: nowrap;
     flex-shrink: 0;
 }
@@ -606,7 +606,7 @@ header {
 .guide-key.gray   { background: var(--bg-key-theme); }
 .guide-desc {
     color: var(--fg-guide-desc);
-    font-size: 0.72rem;
+    font-size: 0.78rem;
     line-height: 1.3;
 }
 
@@ -728,27 +728,27 @@ header {
             <div class="guide-state">商品登録</div>
             <div class="guide-item">
                 <span class="guide-key green">Enter</span>
-                <span class="guide-desc">コード/数量確定</span>
+                <span class="guide-desc">商品コード確定<br>数量確定</span>
             </div>
             <div class="guide-item">
                 <span class="guide-key red">BS</span>
-                <span class="guide-desc">1文字削除</span>
+                <span class="guide-desc">入力を1文字削除</span>
             </div>
             <div class="guide-item">
                 <span class="guide-key orange">－</span>
-                <span class="guide-desc">直前を削除</span>
+                <span class="guide-desc">直前の商品を削除</span>
             </div>
             <div class="guide-item">
                 <span class="guide-key blue">＋</span>
-                <span class="guide-desc">数量を変更</span>
+                <span class="guide-desc">直前の数量を変更</span>
             </div>
         </div>
 
         <div class="guide-section">
-            <div class="guide-state">会計へ</div>
+            <div class="guide-state">会計へ進む</div>
             <div class="guide-item">
                 <span class="guide-key purple">00</span>
-                <span class="guide-desc">会計フェーズへ</span>
+                <span class="guide-desc">お会計フェーズへ</span>
             </div>
         </div>
 
@@ -756,11 +756,11 @@ header {
             <div class="guide-state">会計</div>
             <div class="guide-item">
                 <span class="guide-key green">Enter</span>
-                <span class="guide-desc">預かり金額確定</span>
+                <span class="guide-desc">お預かり金額確定</span>
             </div>
             <div class="guide-item">
                 <span class="guide-key red">BS</span>
-                <span class="guide-desc">1桁削除</span>
+                <span class="guide-desc">金額を1桁削除</span>
             </div>
         </div>
 
@@ -768,11 +768,11 @@ header {
             <div class="guide-state">その他</div>
             <div class="guide-item">
                 <span class="guide-key teal">履歴</span>
-                <span class="guide-desc">履歴を開閉</span>
+                <span class="guide-desc">レシート履歴を開閉</span>
             </div>
             <div class="guide-item">
                 <span class="guide-key gray">÷</span>
-                <span class="guide-desc">テーマ切替</span>
+                <span class="guide-desc">表示テーマ切替</span>
             </div>
         </div>
     </div>
