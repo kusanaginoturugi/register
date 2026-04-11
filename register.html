@@ -430,11 +430,16 @@ header {
     font-size: 0.82rem;
     align-items: center;
 }
-.product-row:last-child { border-bottom: none; }
+/* 2列表示: 最終行の2アイテムは下ボーダーなし */
+.product-row:last-child,
+.product-row:nth-last-child(2):nth-child(odd) { border-bottom: none; }
+/* 左列アイテムに右ボーダーで列区切り */
+.product-row:nth-child(odd) { border-right: 1px solid var(--border-row); }
 .product-row:hover { background: var(--bg-row-hover); }
 .p-code  { color: var(--fg-p-code); }
 .p-name  { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; min-width: 0; }
 .p-price { color: var(--fg-p-price); font-weight: 600; white-space: nowrap; }
+#productList { display: grid; grid-template-columns: 1fr 1fr; }
 
 /* ── Controls ── */
 .controls {
