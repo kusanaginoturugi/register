@@ -318,7 +318,7 @@ header {
 /* Cart */
 .cart-panel {
     flex: 1;
-    max-width: 380px;
+    max-width: min(380px, 38%);
     background: var(--bg-panel);
     border: var(--border-panel);
     border-radius: 8px 8px 0 0;
@@ -374,7 +374,7 @@ header {
 /* Product list */
 .product-panel {
     flex: 1;
-    min-width: 200px;
+    min-width: clamp(160px, 28%, 480px);
     background: var(--bg-panel);
     border: var(--border-panel);
     border-radius: 8px 8px 0 0;
@@ -404,9 +404,9 @@ header {
 .p-code  { color: var(--fg-p-code); }
 .p-name  { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; min-width: 0; }
 .p-price { color: var(--fg-p-price); font-weight: 600; white-space: nowrap; }
-/* 段組レイアウト: 前半→1列目・後半→2列目に自動的に流し込む */
+/* 段組レイアウト: 列幅を指定して列数は自動計算（幅に応じて1〜3列に可変） */
 #productList {
-    column-count: 2;
+    column-width: 260px;
     column-rule: 1px solid var(--border-row);
 }
 .product-row { break-inside: avoid; }
