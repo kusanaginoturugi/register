@@ -1226,10 +1226,10 @@ function playDrawer() {
 function press(key) {
     // * キーは状態によらず履歴トグル
     if (key === '*') { toggleHistory(); return; }
-    // / キーは状態によらずテーマ切替
-    if (key === '/') { nextTheme(); return; }
-    // . キーはパネル表示切替 (全表示→ガイド非表示→カートのみ→全表示)
-    if (key === '.') { togglePanelView(); return; }
+    // / キーはパネル表示切替 (全表示→ガイド非表示→カートのみ→全表示)
+    if (key === '/') { togglePanelView(); return; }
+    // . キーはテーマ切替
+    if (key === '.') { nextTheme(); return; }
 
     switch (state) {
         case S.CODE:    onCode(key);       break;
@@ -1519,7 +1519,7 @@ function applyTheme() {
 
 // ─── 初期化 ───────────────────────────────────────────────────
 (function () {
-    const saved = localStorage.getItem('register_theme') || 'dark';
+    const saved = localStorage.getItem('register_theme') || 'outdoor';
     themeIdx = THEMES.findIndex(t => t.id === saved);
     if (themeIdx < 0) themeIdx = 0;
     applyTheme();
