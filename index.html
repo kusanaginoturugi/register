@@ -305,6 +305,13 @@ header {
 .header-count span { color: var(--fg-count-val); font-weight: bold; }
 .header-version { font-size: 0.72rem; opacity: 0.55; letter-spacing: 0.02em; }
 
+@media (max-width: 520px) {
+    .header-title-text { display: none; }
+    .header-dl         { display: none; }
+    .header-count      { display: none; }
+    .header-version    { display: none; }
+}
+
 /* ── Panels ── */
 .panels {
     display: flex;
@@ -682,10 +689,10 @@ header {
 <body>
 
 <header>
-    テンキーレジシステム
+    🧾<span class="header-title-text"> テンキーレジ</span>
     <div class="header-right">
         <span class="header-count" id="headerCount">本日 <span>0</span> 件</span>
-        <a class="theme-btn" href="register_offline.zip" download>↓ オフライン版DL</a>
+        <a class="theme-btn header-dl" href="register_offline.zip" download>↓ オフライン版DL</a>
         <button class="theme-btn" onclick="openProdMgr()">商品管理</button>
         <button id="panelBtn" class="theme-btn" onclick="togglePanels()">◧ 操作方法を隠す</button>
         <span class="header-version">2026.04.22</span>
