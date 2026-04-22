@@ -7,6 +7,7 @@ on:
       - index.html
       - register.py
       - register_manual.md
+  workflow_dispatch:
 
 permissions:
   contents: write        # ← これが抜けていた
