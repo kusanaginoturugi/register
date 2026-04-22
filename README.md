@@ -111,6 +111,15 @@ ZIPはソースファイルの変更時にGitHub Actionsが自動更新します
 
 ---
 
+## 🎁 Wishlist / 機材寄付募集
+
+レシートプリンタ対応（Epson ePOS-Print SDK 利用）を実装したいのですが、実機がありません。
+Epson製のePOS対応レシートプリンタ（TM-m30、TM-T88VIなど、新品／中古可）をご提供いただける方を募集しています。
+
+詳細 → [#2 レシートプリンタ対応（Epson ePOS-Print SDK）＋機材寄付募集](https://github.com/kusanaginoturugi/register/issues/2)
+
+---
+
 ## ライセンス
 
 MIT License
