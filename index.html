@@ -1406,7 +1406,7 @@ function renderDisplay() {
                 : '';
             label.textContent = '商品コード入力  /  [00]=会計  /  [－]=直前削除  /  [＋]=数量変更  /  [履歴]=レシート一覧';
             val.innerHTML = `<span>${input || '__'}</span>`
-                + `<span style="font-size:calc(1em - 2px);color:var(--fg-msg-info);margin-left:14px;letter-spacing:0">${preview}</span>`;
+                + `<span style="font-size:smaller;color:var(--fg-msg-info);margin-left:14px;letter-spacing:0">${preview}</span>`;
             break;
         }
         case S.QTY:
