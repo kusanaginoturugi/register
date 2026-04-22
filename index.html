@@ -1492,9 +1492,11 @@ function togglePanels() {
     panelStage = (panelStage + 1) % 3;
     const guide   = document.querySelector('.guide-panel');
     const product = document.querySelector('.product-panel');
+    const cart    = document.querySelector('.cart-panel');
     const btn     = document.getElementById('panelBtn');
     if (guide)   guide.style.display   = panelStage >= 1 ? 'none' : '';
     if (product) product.style.display = panelStage >= 2 ? 'none' : '';
+    if (cart)    cart.style.maxWidth   = panelStage >= 2 ? 'none' : '';
     if (btn) btn.textContent = PANEL_LABELS[panelStage];
 }
 
