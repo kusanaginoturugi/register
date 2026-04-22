@@ -687,7 +687,7 @@ header {
         <span class="header-count" id="headerCount">本日 <span>0</span> 件</span>
         <a class="theme-btn" href="register_offline.zip" download>↓ オフライン版DL</a>
         <button class="theme-btn" onclick="openProdMgr()">商品管理</button>
-        <button id="themeBtn" class="theme-btn" onclick="nextTheme()">◑ ハイコントラスト</button>
+        <button id="panelBtn" class="theme-btn" onclick="togglePanels()">◧ パネル非表示</button>
         <span class="header-version">2026.04.22</span>
 </div>
 </header>
@@ -1213,8 +1213,8 @@ function playDrawer() {
 function press(key) {
     // * キーは状態によらず履歴トグル
     if (key === '*') { toggleHistory(); return; }
-    // / キーは状態によらずテーマ切替
-    if (key === '/') { nextTheme(); return; }
+    // / キーは状態によらずパネルトグル
+    if (key === '/') { togglePanels(); return; }
 
     switch (state) {
         case S.CODE:    onCode(key);       break;
@@ -1478,36 +1478,26 @@ document.addEventListener('keydown', e => {
     if (k) { e.preventDefault(); press(k); }
 });
 
-// ─── テーマ ──────────────────────────────────────────────────
-const THEMES = [
-    { id: 'dark',    label: 'ダーク' },
-    { id: 'light',   label: 'ライト' },
-    { id: 'outdoor', label: '屋外' },
-    { id: 'hc',      label: 'ハイコントラスト' },
-];
-let themeIdx = 0;
+// ─── テーマ（屋外固定） ──────────────────────────────────────
+(function () {
+    document.body.classList.add('outdoor');
+})();
 
-function nextTheme() {
-    themeIdx = (themeIdx + 1) % THEMES.length;
-    applyTheme();
-}
+// ─── パネル表示トグル ────────────────────────────────────────
+let panelsVisible = true;
 
-function applyTheme() {
-    THEMES.forEach(t => document.body.classList.remove(t.id));
-    if (THEMES[themeIdx].id !== 'dark') document.body.classList.add(THEMES[themeIdx].id);
-    localStorage.setItem('register_theme', THEMES[themeIdx].id);
-    const btn  = document.getElementById('themeBtn');
-    const next = THEMES[(themeIdx + 1) % THEMES.length];
-    if (btn) btn.textContent = `◑ ${next.label}`;
+function togglePanels() {
+    panelsVisible = !panelsVisible;
+    const guide   = document.querySelector('.guide-panel');
+    const product = document.querySelector('.product-panel');
+    const btn     = document.getElementById('panelBtn');
+    const display = panelsVisible ? '' : 'none';
+    if (guide)   guide.style.display   = display;
+    if (product) product.style.display = display;
+    if (btn) btn.textContent = panelsVisible ? '◧ パネル非表示' : '◨ パネル表示';
 }
 
 // ─── 初期化 ───────────────────────────────────────────────────
-(function () {
-    const saved = localStorage.getItem('register_theme') || 'dark';
-    themeIdx = THEMES.findIndex(t => t.id === saved);
-    if (themeIdx < 0) themeIdx = 0;
-    applyTheme();
-})();
 initProducts();
 renderProductList();
 renderHeaderCount();
