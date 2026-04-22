@@ -687,7 +687,7 @@ header {
         <span class="header-count" id="headerCount">本日 <span>0</span> 件</span>
         <a class="theme-btn" href="register_offline.zip" download>↓ オフライン版DL</a>
         <button class="theme-btn" onclick="openProdMgr()">商品管理</button>
-        <button id="panelBtn" class="theme-btn" onclick="togglePanels()">◧ パネル非表示</button>
+        <button id="panelBtn" class="theme-btn" onclick="togglePanels()">◧ 操作方法を隠す</button>
         <span class="header-version">2026.04.22</span>
 </div>
 </header>
@@ -1478,23 +1478,24 @@ document.addEventListener('keydown', e => {
     if (k) { e.preventDefault(); press(k); }
 });
 
-// ─── テーマ（屋外固定） ──────────────────────────────────────
+// ─── テーマ（青：light固定） ─────────────────────────────────
 (function () {
-    document.body.classList.add('outdoor');
+    document.body.classList.add('light');
 })();
 
-// ─── パネル表示トグル ────────────────────────────────────────
-let panelsVisible = true;
+// ─── パネル表示トグル（3段階） ───────────────────────────────
+// 0: 両方表示  1: 操作方法のみ非表示  2: 両方非表示
+let panelStage = 0;
+const PANEL_LABELS = ['◧ 操作方法を隠す', '◨ 商品一覧も隠す', '◩ パネルを戻す'];
 
 function togglePanels() {
-    panelsVisible = !panelsVisible;
+    panelStage = (panelStage + 1) % 3;
     const guide   = document.querySelector('.guide-panel');
     const product = document.querySelector('.product-panel');
     const btn     = document.getElementById('panelBtn');
-    const display = panelsVisible ? '' : 'none';
-    if (guide)   guide.style.display   = display;
-    if (product) product.style.display = display;
-    if (btn) btn.textContent = panelsVisible ? '◧ パネル非表示' : '◨ パネル表示';
+    if (guide)   guide.style.display   = panelStage >= 1 ? 'none' : '';
+    if (product) product.style.display = panelStage >= 2 ? 'none' : '';
+    if (btn) btn.textContent = PANEL_LABELS[panelStage];
 }
 
 // ─── 初期化 ───────────────────────────────────────────────────
