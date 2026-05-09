@@ -305,6 +305,17 @@ header {
 .header-count span { color: var(--fg-count-val); font-weight: bold; }
 .header-version { font-size: 0.72rem; opacity: 0.55; letter-spacing: 0.02em; }
 
+@media (max-width: 520px) {
+    .header-title-text { display: none; }
+    .header-dl         { display: none; }
+    .header-count      { display: none; }
+    .header-version    { display: none; }
+    .d-label    { font-size: 1.1rem; }
+    .d-value    { font-size: 2.8rem; letter-spacing: 6px; min-height: 3.2rem; }
+    .d-msg      { font-size: 1rem; }
+    .controls   { padding: 12px 8px; }
+}
+
 /* ── Panels ── */
 .panels {
     display: flex;
@@ -318,7 +329,6 @@ header {
 /* Cart */
 .cart-panel {
     flex: 1;
-    max-width: min(380px, 38%);
     background: var(--bg-panel);
     border: var(--border-panel);
     border-radius: 8px 8px 0 0;
@@ -373,8 +383,7 @@ header {
 
 /* Product list */
 .product-panel {
-    flex: 1;
-    min-width: clamp(160px, 28%, 480px);
+    flex: 0 0 auto;
     background: var(--bg-panel);
     border: var(--border-panel);
     border-radius: 8px 8px 0 0;
@@ -687,13 +696,13 @@ body.view-2 .product-panel { display: none; }
 <body>
 
 <header>
-    テンキーレジシステム
+    🧾<span class="header-title-text"> テンキーレジ</span>
     <div class="header-right">
         <span class="header-count" id="headerCount">本日 <span>0</span> 件</span>
-        <a class="theme-btn" href="register_offline.zip" download>↓ オフライン版DL</a>
+        <a class="theme-btn header-dl" href="register_offline.zip" download>↓ オフライン版DL</a>
         <button class="theme-btn" onclick="openProdMgr()">商品管理</button>
-        <button id="themeBtn" class="theme-btn" onclick="nextTheme()">◑ ハイコントラスト</button>
-        <span class="header-version">2026.04.11</span>
+        <button id="panelBtn" class="theme-btn" onclick="togglePanels()">◧ 操作方法を隠す</button>
+        <span class="header-version">2026.05.09</span>
 </div>
 </header>
 
@@ -750,8 +759,8 @@ body.view-2 .product-panel { display: none; }
                 <span class="guide-desc">レシート履歴を開閉</span>
             </div>
             <div class="guide-item">
-                <span class="guide-key">÷</span>
-                <span class="guide-desc">表示テーマ切替</span>
+                <span class="guide-key">/</span>
+                <span class="guide-desc">表示切替</span>
             </div>
         </div>
     </div>
@@ -1410,7 +1419,7 @@ function renderDisplay() {
                 : '';
             label.textContent = '商品コード入力  /  [00]=会計  /  [－]=直前削除  /  [＋]=数量変更  /  [＊]=レシート一覧';
             val.innerHTML = `<span>${input || '__'}</span>`
-                + `<span style="font-size:0.85rem;color:var(--fg-msg-info);margin-left:14px">${preview}</span>`;
+                + `<span style="font-size:smaller;color:var(--fg-msg-info);margin-left:14px;letter-spacing:0">${preview}</span>`;
             break;
         }
         case S.QTY:
@@ -1494,27 +1503,24 @@ document.addEventListener('keydown', e => {
     if (k) { e.preventDefault(); press(k); }
 });
 
-// ─── テーマ ──────────────────────────────────────────────────
-const THEMES = [
-    { id: 'dark',    label: 'ダーク' },
-    { id: 'light',   label: 'ライト' },
-    { id: 'outdoor', label: '屋外' },
-    { id: 'hc',      label: 'ハイコントラスト' },
-];
-let themeIdx = 0;
+// ─── テーマ（青：light固定） ─────────────────────────────────
+(function () {
+    document.body.classList.add('light');
+})();
 
-function nextTheme() {
-    themeIdx = (themeIdx + 1) % THEMES.length;
-    applyTheme();
-}
+// ─── パネル表示トグル（3段階） ───────────────────────────────
+// 0: 両方表示  1: 操作方法のみ非表示  2: 両方非表示
+let panelStage = 0;
+const PANEL_LABELS = ['◧ 操作方法を隠す', '◨ 商品一覧も隠す', '◩ パネルを戻す'];
 
-function applyTheme() {
-    THEMES.forEach(t => document.body.classList.remove(t.id));
-    if (THEMES[themeIdx].id !== 'dark') document.body.classList.add(THEMES[themeIdx].id);
-    localStorage.setItem('register_theme', THEMES[themeIdx].id);
-    const btn  = document.getElementById('themeBtn');
-    const next = THEMES[(themeIdx + 1) % THEMES.length];
-    if (btn) btn.textContent = `◑ ${next.label}`;
+function togglePanels() {
+    panelStage = (panelStage + 1) % 3;
+    const guide   = document.querySelector('.guide-panel');
+    const product = document.querySelector('.product-panel');
+    const btn     = document.getElementById('panelBtn');
+    if (guide)   guide.style.display   = panelStage >= 1 ? 'none' : '';
+    if (product) product.style.display = panelStage >= 2 ? 'none' : '';
+    if (btn) btn.textContent = PANEL_LABELS[panelStage];
 }
 
 // ─── 初期化 ───────────────────────────────────────────────────
