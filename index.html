@@ -750,7 +750,7 @@ header {
         <div class="guide-section">
             <div class="guide-state">その他</div>
             <div class="guide-item">
-                <span class="guide-key">履歴</span>
+                <span class="guide-key">＊</span>
                 <span class="guide-desc">レシート履歴を開閉</span>
             </div>
             <div class="guide-item">
@@ -1402,7 +1402,7 @@ function renderDisplay() {
             const preview = (input.length === 2 && PRODUCTS[input])
                 ? ` → ${PRODUCTS[input].name}  ¥${fmt(PRODUCTS[input].price)}`
                 : '';
-            label.textContent = '商品コード入力  /  [00]=会計  /  [－]=直前削除  /  [＋]=数量変更  /  [履歴]=レシート一覧';
+            label.textContent = '商品コード入力  /  [00]=会計  /  [－]=直前削除  /  [＋]=数量変更  /  [＊]=レシート一覧';
             val.innerHTML = `<span>${input || '__'}</span>`
                 + `<span style="font-size:smaller;color:var(--fg-msg-info);margin-left:14px;letter-spacing:0">${preview}</span>`;
             break;
