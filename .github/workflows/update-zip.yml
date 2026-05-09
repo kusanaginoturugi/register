@@ -22,7 +22,9 @@ jobs:
           VERSION=$(date -u '+%Y.%m.%d')
           sed -i "s|<span class=\"header-version\">[^<]*</span>|<span class=\"header-version\">${VERSION}</span>|" index.html
       - name: Rebuild ZIP
-        run: zip -j register_offline.zip index.html register.py register_manual.md
+        run: |
+          rm -f register_offline.zip
+          zip -j register_offline.zip index.html register.py register_manual.md
       - name: Commit updated files
         run: |
           git config user.name "github-actions[bot]"
