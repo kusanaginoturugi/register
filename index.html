@@ -545,6 +545,14 @@ body.view-2 .product-panel { display: none; }
     flex-shrink: 0;
 }
 .hist-head-title { font-weight: bold; font-size: 0.95rem; flex: 1; }
+.hist-export-help {
+    padding: 7px 14px;
+    font-size: 0.76rem;
+    color: var(--fg-hist-summary);
+    background: var(--bg-hist-summary);
+    border-bottom: 1px solid var(--border-row);
+    flex-shrink: 0;
+}
 .hist-btn {
     background: #37474f;
     color: #eceff1;
@@ -837,10 +845,11 @@ body.view-2 .product-panel { display: none; }
 <div class="history-panel hidden" id="historyPanel">
     <div class="hist-head">
         <span class="hist-head-title">レシート履歴</span>
-        <button class="hist-btn" onclick="exportCSV()">CSV 保存</button>
+        <button class="hist-btn" onclick="exportCSV()">Excel用に保存</button>
         <button class="hist-btn danger" onclick="clearAllReceipts()">全件削除</button>
         <button class="hist-btn" onclick="toggleHistory()">✕ 閉じる</button>
     </div>
+    <div class="hist-export-help">Excelで開ける売上一覧を保存します</div>
     <div class="hist-summary" id="histSummary"></div>
     <div class="hist-list" id="histList"></div>
 </div>
@@ -1071,7 +1080,13 @@ function exportCSV() {
     const receipts = loadReceipts();
     if (receipts.length === 0) { alert('レシートがありません'); return; }
 
+    const total = receipts.reduce((s, r) => s + r.total, 0);
     const rows = [
+        ['集計項目', '値'],
+        ['レシート件数', receipts.length],
+        ['合計売上', total],
+        [],
+        ['明細'],
         ['レシート番号', '日時', '商品コード', '商品名', '数量', '単価', '小計', '合計', 'お預かり', 'お釣り'],
     ];
     for (const r of receipts) {
@@ -1093,10 +1108,12 @@ function exportCSV() {
     const url  = URL.createObjectURL(blob);
     const a    = document.createElement('a');
     const d    = new Date();
+    const filename = `receipts_${d.getFullYear()}${String(d.getMonth()+1).padStart(2,'0')}${String(d.getDate()).padStart(2,'0')}.csv`;
     a.href     = url;
-    a.download = `receipts_${d.getFullYear()}${String(d.getMonth()+1).padStart(2,'0')}${String(d.getDate()).padStart(2,'0')}.csv`;
+    a.download = filename;
     a.click();
     URL.revokeObjectURL(url);
+    alert(`保存しました。\nダウンロードフォルダの「${filename}」をExcelで開くと、売上一覧を確認できます。`);
 }
 
 // ─── 履歴パネル ───────────────────────────────────────────────
