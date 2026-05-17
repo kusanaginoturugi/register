@@ -343,7 +343,7 @@ header {
     padding: 6px 12px;
     font-size: 0.76rem;
     display: grid;
-    grid-template-columns: 28px 1fr 48px 60px 72px;
+    grid-template-columns: 28px 1fr 48px 60px 72px 22px;
     gap: 4px;
     flex-shrink: 0;
 }
@@ -357,7 +357,7 @@ header {
 }
 .cart-row {
     display: grid;
-    grid-template-columns: 28px 1fr 48px 60px 72px;
+    grid-template-columns: 28px 1fr 48px 60px 72px 22px;
     gap: 4px;
     padding: 7px 12px;
     border-bottom: 1px solid var(--border-row);
@@ -368,6 +368,23 @@ header {
     background: var(--bg-last-item);
     border-left: 3px solid var(--bd-last-item);
     padding-left: 9px;
+}
+.cart-delete {
+    width: 18px;
+    height: 18px;
+    border: none;
+    border-radius: 50%;
+    background: transparent;
+    color: var(--fg-empty);
+    cursor: pointer;
+    font-size: 0.82rem;
+    line-height: 18px;
+    text-align: center;
+    font-family: inherit;
+}
+.cart-delete:hover {
+    background: var(--bg-key-bs);
+    color: #fff;
 }
 .cart-foot {
     background: var(--bg-cart-foot);
@@ -849,6 +866,7 @@ body.view-2 .product-panel { display: none; }
             <span class="r">数量</span>
             <span class="r">単価</span>
             <span class="r">小計</span>
+            <span></span>
         </div>
         <div class="cart-body" id="cartBody">
             <div class="cart-empty">商品を登録してください</div>
@@ -1091,6 +1109,21 @@ function addProductFromList(event) {
     priceEl.value = '';
     codeEl.focus();
     setMsg(`[${code}] ${name} を登録しました`, 'success');
+    render();
+}
+
+function deleteCartItem(index) {
+    const item = cart[index];
+    if (!item) return;
+    if (!confirm(`「${item.name}」をカートから削除しますか？`)) return;
+
+    cart.splice(index, 1);
+    input = '';
+    if (state === S.CHG_QTY || state === S.QTY) {
+        selProd = null;
+        state = S.CODE;
+    }
+    setMsg(`「${item.name}」をカートから削除しました`, 'success');
     render();
 }
 
@@ -1628,6 +1661,7 @@ function renderCart() {
                 <span class="r">${item.qty}</span>
                 <span class="r">¥${fmt(item.price)}</span>
                 <span class="r">¥${fmt(item.subtotal)}</span>
+                <button class="cart-delete" type="button" onclick="deleteCartItem(${i})" title="削除" aria-label="${escapeHTML(item.name)}をカートから削除">×</button>
             </div>
         `).join('');
         body.scrollTop = body.scrollHeight;
