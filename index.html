@@ -1633,12 +1633,6 @@ function togglePanels() {
 }
 
 // ─── 初期化 ───────────────────────────────────────────────────
-(function () {
-    const saved = localStorage.getItem('register_theme') || 'outdoor';
-    themeIdx = THEMES.findIndex(t => t.id === saved);
-    if (themeIdx < 0) themeIdx = 0;
-    applyTheme();
-})();
 initProducts();
 renderProductList();
 renderHeaderCount();
