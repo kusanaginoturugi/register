@@ -102,7 +102,7 @@ body.hc {
     --fg-disp-val:     #ffff00;
     --fg-disp-ph:      #223388;
     --fg-disp-done:    #ff9900;
-    --sz-disp-val:     2.2rem;
+    --sz-disp-val:     1.9rem;
     --fg-msg-err:      #ff4444;
     --fg-msg-ok:       #00cc44;
     --fg-msg-info:     #4499ff;
@@ -224,7 +224,7 @@ body.outdoor {
     --fg-disp-val:     #000000;
     --fg-disp-ph:      #bbbbbb;
     --fg-disp-done:    #cc5500;
-    --sz-disp-val:     3.0rem;
+    --sz-disp-val:     2.2rem;
     --fg-msg-err:      #cc0000;
     --fg-msg-ok:       #006600;
     --fg-msg-info:     #003399;
@@ -310,7 +310,7 @@ header {
     .header-dl         { display: none; }
     .header-count      { display: none; }
     .header-version    { display: none; }
-    .d-label    { font-size: 1.1rem; }
+    .d-label    { font-size: 2.8rem; }
     .d-value    { font-size: 2.8rem; letter-spacing: 6px; min-height: 3.2rem; }
     .d-msg      { font-size: 1rem; }
     .controls   { padding: 12px 8px; }
@@ -399,6 +399,38 @@ header {
     top: 0;
     z-index: 1;
 }
+.product-add-form {
+    display: grid;
+    grid-template-columns: 44px minmax(90px, 1fr) 64px auto;
+    gap: 6px;
+    padding: 8px 12px;
+    background: var(--bg-hist-summary);
+    border-bottom: 1px solid var(--border-row);
+    align-items: center;
+}
+.product-add-form input {
+    min-width: 0;
+    padding: 6px 7px;
+    border: 1px solid var(--border-row);
+    border-radius: 5px;
+    background: var(--bg-panel);
+    color: var(--fg-hist-strong);
+    font-size: 0.78rem;
+    font-family: inherit;
+}
+.product-add-form input::placeholder { color: var(--fg-empty); }
+.product-add-form button {
+    padding: 6px 10px;
+    background: var(--bg-key-enter);
+    color: #fff;
+    border: none;
+    border-radius: 5px;
+    font-size: 0.78rem;
+    cursor: pointer;
+    white-space: nowrap;
+    font-family: inherit;
+}
+.product-add-form button:hover { filter: brightness(1.12); }
 .product-row {
     display: grid;
     grid-template-columns: 30px minmax(0, 1fr) auto;
@@ -441,7 +473,7 @@ header {
     transition: background .2s;
 }
 .d-label {
-    font-size: 0.9rem;
+    font-size: var(--sz-disp-val);
     font-weight: 600;
     color: var(--fg-disp-lbl);
     letter-spacing: 0.03em;
@@ -714,6 +746,14 @@ body.view-2 .product-panel { display: none; }
 </div>
 </header>
 
+<div class="controls">
+    <div class="display" id="display">
+        <div class="d-label" id="dLabel">商品コードを入力してください</div>
+        <div class="d-value" id="dValue">__</div>
+        <div class="d-msg"   id="dMsg"></div>
+    </div>
+</div>
+
 <div class="panels">
 
     <!-- Guide panel -->
@@ -792,15 +832,13 @@ body.view-2 .product-panel { display: none; }
 
     <div class="product-panel">
         <div class="product-head">商品一覧</div>
+        <form class="product-add-form" onsubmit="addProductFromList(event)">
+            <input id="addProductCode" inputmode="numeric" maxlength="2" placeholder="コード" aria-label="商品コード">
+            <input id="addProductName" placeholder="商品名" aria-label="商品名">
+            <input id="addProductPrice" inputmode="numeric" placeholder="単価" aria-label="単価">
+            <button type="submit">登録</button>
+        </form>
         <div id="productList"></div>
-    </div>
-</div>
-
-<div class="controls">
-    <div class="display" id="display">
-        <div class="d-label" id="dLabel">商品コードを入力してください</div>
-        <div class="d-value" id="dValue">__</div>
-        <div class="d-msg"   id="dMsg"></div>
     </div>
 </div>
 
@@ -978,6 +1016,53 @@ function updateProdMgrInfo() {
     if (el) el.innerHTML =
         `商品数: <strong>${count}</strong> 件 &nbsp;／&nbsp; データ: <strong>${src}</strong><br>` +
         `<span style="font-size:0.76rem">CSVフォーマット: コード,商品名,単価　（1行目はヘッダー）</span>`;
+}
+
+function saveProducts() {
+    localStorage.setItem(PRODUCTS_STORAGE_KEY, JSON.stringify(PRODUCTS));
+}
+
+function validateProductInput(code, name, priceText) {
+    if (!/^\d{2}$/.test(code)) return { error: '商品コードは2桁の数字で入力してください' };
+    if (['00','98','99'].includes(code)) return { error: `コード ${code} は予約済みです` };
+    if (!name) return { error: '商品名を入力してください' };
+    if (!/^\d+$/.test(priceText)) return { error: '単価は1円以上の数字で入力してください' };
+    const price = parseInt(priceText, 10);
+    if (!Number.isInteger(price) || price <= 0) return { error: '単価は1円以上の数字で入力してください' };
+    return { price };
+}
+
+function addProductFromList(event) {
+    event.preventDefault();
+    const codeEl  = document.getElementById('addProductCode');
+    const nameEl  = document.getElementById('addProductName');
+    const priceEl = document.getElementById('addProductPrice');
+    const code  = codeEl.value.trim();
+    const name  = nameEl.value.trim();
+    const priceText = priceEl.value.trim();
+    const result = validateProductInput(code, name, priceText);
+
+    if (result.error) {
+        setMsg(result.error, 'error');
+        render();
+        return;
+    }
+    if (PRODUCTS[code]) {
+        setMsg(`コード ${code} は既に登録されています`, 'error');
+        render();
+        return;
+    }
+
+    PRODUCTS[code] = { name, price: result.price };
+    saveProducts();
+    renderProductList();
+    updateProdMgrInfo();
+    codeEl.value = '';
+    nameEl.value = '';
+    priceEl.value = '';
+    codeEl.focus();
+    setMsg(`[${code}] ${name} を登録しました`, 'success');
+    render();
 }
 
 function exportProductsCSV() {
@@ -1164,7 +1249,7 @@ function renderHistory() {
             <div class="hist-receipt-body" id="body-${r.receiptNo}">
                 ${r.items.map(item => `
                     <div class="h-item">
-                        <span>${item.name}</span>
+                        <span>${escapeHTML(item.name)}</span>
                         <span>${item.qty}</span>
                         <span>¥${fmt(item.price)}</span>
                         <span>¥${fmt(item.subtotal)}</span>
@@ -1388,6 +1473,11 @@ function onChangeDone(key) {
 // ─── ユーティリティ ────────────────────────────────────────────
 function cartTotal() { return cart.reduce((s, i) => s + i.subtotal, 0); }
 function fmt(n) { return n.toLocaleString('ja-JP'); }
+function escapeHTML(value) {
+    return String(value).replace(/[&<>"']/g, c => ({
+        '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;',
+    }[c]));
+}
 
 // ─── 描画 ─────────────────────────────────────────────────────
 function render() {
@@ -1410,7 +1500,7 @@ function renderCart() {
         body.innerHTML = cart.map((item, i) => `
             <div class="cart-row${i === cart.length - 1 ? ' last-item' : ''}">
                 <span>${i + 1}</span>
-                <span>${item.name}</span>
+                <span>${escapeHTML(item.name)}</span>
                 <span class="r">${item.qty}</span>
                 <span class="r">¥${fmt(item.price)}</span>
                 <span class="r">¥${fmt(item.subtotal)}</span>
@@ -1432,7 +1522,7 @@ function renderDisplay() {
     switch (state) {
         case S.CODE: {
             const preview = (input.length === 2 && PRODUCTS[input])
-                ? ` → ${PRODUCTS[input].name}  ¥${fmt(PRODUCTS[input].price)}`
+                ? ` → ${escapeHTML(PRODUCTS[input].name)}  ¥${fmt(PRODUCTS[input].price)}`
                 : '';
             label.textContent = '商品コード入力  /  [00]=会計  /  [－]=直前削除  /  [＋]=数量変更  /  [＊]=レシート一覧';
             val.innerHTML = `<span>${input || '__'}</span>`
@@ -1488,7 +1578,7 @@ function renderProductList() {
         .map(([code, { name, price }]) => `
             <div class="product-row">
                 <span class="p-code">${code}</span>
-                <span class="p-name">${name}</span>
+                <span class="p-name">${escapeHTML(name)}</span>
                 <span class="p-price">¥${fmt(price)}</span>
             </div>
         `).join('');
@@ -1496,6 +1586,8 @@ function renderProductList() {
 
 // ─── キーボード入力（実物テンキー対応） ─────────────────────────
 document.addEventListener('keydown', e => {
+    if (['INPUT', 'TEXTAREA', 'SELECT'].includes(e.target.tagName)) return;
+
     const map = {
         Numpad0: '0',  Digit0: '0',
         Numpad1: '1',  Digit1: '1',
