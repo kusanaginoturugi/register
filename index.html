@@ -657,6 +657,35 @@ body.view-2 .product-panel { display: none; }
     padding-top: 2px;
 }
 .h-foot strong { color: var(--fg-hist-strong); }
+.hist-product-head,
+.hist-product-row {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 72px 96px;
+    gap: 8px;
+    padding: 8px 14px;
+    border-bottom: 1px solid var(--border-row);
+    align-items: center;
+    font-size: 0.84rem;
+}
+.hist-product-head {
+    background: var(--bg-hist-summary);
+    color: var(--fg-hist-summary);
+    font-size: 0.76rem;
+    font-weight: bold;
+}
+.hist-product-row { color: var(--fg-hist-item); }
+.hist-product-name {
+    color: var(--fg-hist-strong);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+.hist-product-qty,
+.hist-product-total { text-align: right; }
+.hist-product-total {
+    color: var(--fg-hist-tot);
+    font-weight: bold;
+}
 
 /* ── 商品マスター管理モーダル ── */
 .prod-mgr-overlay {
@@ -772,7 +801,7 @@ body.view-2 .product-panel { display: none; }
             </div>
             <div class="guide-item">
                 <span class="guide-key">－</span>
-                <span class="guide-desc">直前の商品を削除</span>
+                <span class="guide-desc">直前の登録を削除</span>
             </div>
             <div class="guide-item">
                 <span class="guide-key">＋</span>
@@ -804,7 +833,7 @@ body.view-2 .product-panel { display: none; }
             <div class="guide-state">その他</div>
             <div class="guide-item">
                 <span class="guide-key">＊</span>
-                <span class="guide-desc">レシート履歴を開閉</span>
+                <span class="guide-desc">履歴→集計→閉じる</span>
             </div>
             <div class="guide-item">
                 <span class="guide-key">/</span>
@@ -882,12 +911,12 @@ body.view-2 .product-panel { display: none; }
 <!-- ── History panel ─────────────────────── -->
 <div class="history-panel hidden" id="historyPanel">
     <div class="hist-head">
-        <span class="hist-head-title">レシート履歴</span>
-        <button class="hist-btn" onclick="exportCSV()">Excel用に保存</button>
-        <button class="hist-btn danger" onclick="clearAllReceipts()">全件削除</button>
-        <button class="hist-btn" onclick="toggleHistory()">✕ 閉じる</button>
+        <span class="hist-head-title" id="histTitle">レシート履歴</span>
+        <button class="hist-btn" onclick="exportCurrentHistoryViewCSV()">Excel用に保存</button>
+        <button class="hist-btn danger" id="histClearBtn" onclick="clearAllReceipts()">全件削除</button>
+        <button class="hist-btn" onclick="closeHistory()">✕ 閉じる</button>
     </div>
-    <div class="hist-export-help">Excelで開ける売上一覧を保存します</div>
+    <div class="hist-export-help" id="histExportHelp">Excelで開ける売上一覧を保存します</div>
     <div class="hist-summary" id="histSummary"></div>
     <div class="hist-list" id="histList"></div>
 </div>
@@ -1203,6 +1232,7 @@ function exportCSV() {
 
 // ─── 履歴パネル ───────────────────────────────────────────────
 let historyOpen = false;
+let historyMode = 'receipts';
 
 function togglePanelView() {
     panelView = (panelView + 1) % 3;
@@ -1211,20 +1241,37 @@ function togglePanelView() {
 }
 
 function toggleHistory() {
-    historyOpen = !historyOpen;
     const panel = document.getElementById('historyPanel');
-    if (historyOpen) {
+    if (!historyOpen) {
+        historyOpen = true;
+        historyMode = 'receipts';
         renderHistory();
         panel.classList.remove('hidden');
+    } else if (historyMode === 'receipts') {
+        historyMode = 'products';
+        renderHistory();
     } else {
-        panel.classList.add('hidden');
+        closeHistory();
     }
 }
 
+function closeHistory() {
+    historyOpen = false;
+    document.getElementById('historyPanel').classList.add('hidden');
+}
+
 function renderHistory() {
+    if (historyMode === 'products') {
+        renderProductSummary();
+        return;
+    }
+
     const receipts = loadReceipts().slice().reverse(); // 新しい順
     const listEl   = document.getElementById('histList');
     const sumEl    = document.getElementById('histSummary');
+    document.getElementById('histTitle').textContent = 'レシート履歴';
+    document.getElementById('histExportHelp').textContent = 'Excelで開ける売上一覧を保存します';
+    document.getElementById('histClearBtn').style.display = '';
 
     // サマリー
     const total = receipts.reduce((s, r) => s + r.total, 0);
@@ -1264,6 +1311,83 @@ function renderHistory() {
             </div>
         </div>
     `).join('');
+}
+
+function collectProductSummary() {
+    const products = new Map();
+    for (const receipt of loadReceipts()) {
+        for (const item of receipt.items) {
+            const key = item.name;
+            const current = products.get(key) || { name: item.name, qty: 0, total: 0 };
+            current.qty += item.qty;
+            current.total += item.subtotal;
+            products.set(key, current);
+        }
+    }
+    return [...products.values()].sort((a, b) => b.total - a.total || a.name.localeCompare(b.name));
+}
+
+function renderProductSummary() {
+    const rows = collectProductSummary();
+    const receiptCount = loadReceipts().length;
+    const totalQty = rows.reduce((s, row) => s + row.qty, 0);
+    const totalAmount = rows.reduce((s, row) => s + row.total, 0);
+    const listEl = document.getElementById('histList');
+    const sumEl = document.getElementById('histSummary');
+
+    document.getElementById('histTitle').textContent = '商品別集計';
+    document.getElementById('histExportHelp').textContent = 'Excelで開ける商品別集計を保存します';
+    document.getElementById('histClearBtn').style.display = 'none';
+    sumEl.innerHTML = `レシート <span>${receiptCount}</span> 件  /  合計数 <span>${totalQty}</span>  /  合計金額 <span>¥${fmt(totalAmount)}</span>`;
+
+    if (rows.length === 0) {
+        listEl.innerHTML = '<div class="hist-empty">集計できる商品がありません</div>';
+        return;
+    }
+
+    listEl.innerHTML = `
+        <div class="hist-product-head">
+            <span>商品名</span>
+            <span class="hist-product-qty">合計数</span>
+            <span class="hist-product-total">合計金額</span>
+        </div>
+        ${rows.map(row => `
+            <div class="hist-product-row">
+                <span class="hist-product-name">${escapeHTML(row.name)}</span>
+                <span class="hist-product-qty">${fmt(row.qty)}</span>
+                <span class="hist-product-total">¥${fmt(row.total)}</span>
+            </div>
+        `).join('')}
+    `;
+}
+
+function exportCurrentHistoryViewCSV() {
+    if (historyMode === 'products') exportProductSummaryCSV();
+    else exportCSV();
+}
+
+function exportProductSummaryCSV() {
+    const rows = collectProductSummary();
+    if (rows.length === 0) { alert('集計できる商品がありません'); return; }
+
+    const csvRows = [
+        ['商品名', '合計数', '合計金額'],
+        ...rows.map(row => [row.name, row.qty, row.total]),
+    ];
+    const csv = '\uFEFF' + csvRows.map(row =>
+        row.map(v => `"${String(v).replace(/"/g, '""')}"`).join(',')
+    ).join('\r\n');
+
+    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    const d = new Date();
+    const filename = `product_summary_${d.getFullYear()}${String(d.getMonth()+1).padStart(2,'0')}${String(d.getDate()).padStart(2,'0')}.csv`;
+    a.href = url;
+    a.download = filename;
+    a.click();
+    URL.revokeObjectURL(url);
+    alert(`保存しました。\nダウンロードフォルダの「${filename}」をExcelで開くと、商品別集計を確認できます。`);
 }
 
 function toggleReceiptBody(no) {
@@ -1335,9 +1459,9 @@ function playDrawer() {
 
 // ─── キー処理 ─────────────────────────────────────────────────
 function press(key) {
-    // * キーは状態によらず履歴トグル
+    // * キーは状態によらず履歴→集計→閉じるを切り替える
     if (key === '*') { toggleHistory(); return; }
-    // / キーはパネル表示切替 (全表示→ガイド非表示→カートのみ→全表示)
+    // / キーはパネル表示切替
     if (key === '/') { togglePanelView(); return; }
     // . キーはテーマ切替
     if (key === '.') { nextTheme(); return; }
